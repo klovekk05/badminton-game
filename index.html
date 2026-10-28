@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>3D 프렌즈 배드민턴 - 실시간 온라인 대전</title>
+    <title>3D 스포츠 애니멀 배드민턴</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
-        body { overflow: hidden; background: #070d19; font-family: 'Pretendard', sans-serif; color: #fff; touch-action: none; }
+        body { overflow: hidden; background: #070d19; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif; color: #fff; touch-action: none; }
         
         #canvas-container {
             width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; z-index: 1;
@@ -18,7 +18,7 @@
             padding: 14px; z-index: 10;
         }
 
-        /* 상단 네비게이션 & 스코어 */
+        /* 상단 모드 네비게이션 & 스코어 */
         .header-bar {
             pointer-events: auto; display: flex; justify-content: space-between; align-items: center; width: 100%;
             flex-wrap: wrap; gap: 8px;
@@ -26,7 +26,7 @@
         .mode-nav { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
         .nav-btn {
             background: rgba(30, 41, 59, 0.9); color: #cbd5e1; border: 1px solid #475569;
-            padding: 7px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 12.5px;
+            padding: 7px 13px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 12.5px;
         }
         .nav-btn.active, .nav-btn:hover { background: #2563eb; color: #fff; border-color: #3b82f6; }
         .tut-nav-btn { background: #0284c7; border-color: #38bdf8; }
@@ -43,19 +43,19 @@
 
         .scoreboard {
             background: rgba(15, 23, 42, 0.92); border: 2px solid #334155; border-radius: 12px;
-            padding: 4px 18px; display: flex; gap: 20px; align-items: center; box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+            padding: 5px 20px; display: flex; gap: 20px; align-items: center; box-shadow: 0 8px 25px rgba(0,0,0,0.6);
         }
         .team-box { text-align: center; }
         .team-name { font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 2px; }
-        .team-blue { color: #f59e0b; }
-        .team-red { color: #f472b6; }
+        .team-blue { color: #60a5fa; }
+        .team-red { color: #f87171; }
         .score { font-size: 28px; font-weight: 900; font-family: monospace; }
 
         /* 튜토리얼 4단계 카드 */
         #tutorial-card {
             pointer-events: auto; position: absolute; top: 68px; left: 50%; transform: translateX(-50%);
             background: rgba(15, 23, 42, 0.97); border: 2px solid #38bdf8; border-radius: 16px;
-            padding: 16px 22px; max-width: 660px; width: 94%; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.85);
+            padding: 16px 24px; max-width: 660px; width: 94%; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.85);
             animation: fadeIn 0.3s ease-out;
         }
         @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, -15px); } to { opacity: 1; transform: translate(-50%, 0); } }
@@ -85,7 +85,7 @@
         .btn-out { background: #dc2626; color: #fff; }
         .btn-out:hover { background: #b91c1c; transform: scale(1.04); }
 
-        /* 하단 파워 게이지 바 */
+        /* 1P & 2P 파워 게이지 */
         #power-meter-container {
             position: absolute; bottom: 84px; left: 50%; transform: translateX(-50%);
             background: rgba(15, 23, 42, 0.92); border: 2px solid #475569; border-radius: 20px;
@@ -98,8 +98,8 @@
             width: 140px; height: 11px; background: #1e293b; border-radius: 6px; overflow: hidden;
             border: 1px solid #64748b;
         }
-        .meter-fill-p1 { width: 0%; height: 100%; background: linear-gradient(90deg, #38bdf8, #f59e0b); }
-        .meter-fill-p2 { width: 0%; height: 100%; background: linear-gradient(90deg, #f472b6, #ef4444); }
+        .meter-fill-p1 { width: 0%; height: 100%; background: linear-gradient(90deg, #38bdf8, #3b82f6); }
+        .meter-fill-p2 { width: 0%; height: 100%; background: linear-gradient(90deg, #fb923c, #ef4444); }
 
         #tech-popup {
             position: absolute; top: 32%; left: 50%; transform: translate(-50%, -50%);
@@ -158,7 +158,7 @@
         .action-btn:hover { background: #059669; }
     </style>
 
-    <!-- Three.js 안정 CDN -->
+    <!-- Three.js (이중 안정 CDN) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
         if (typeof THREE === 'undefined') {
@@ -187,12 +187,12 @@
 
             <div class="scoreboard">
                 <div class="team-box team-blue">
-                    <div class="team-name" id="name-blue">🦁 라이언 (1P)</div>
+                    <div class="team-name" id="name-blue">🐻 곰이 (1P)</div>
                     <div class="score" id="score-blue">0</div>
                 </div>
                 <div style="font-weight: bold; color: #64748b;">:</div>
                 <div class="team-box team-red">
-                    <div class="team-name" id="name-red">🍑 어피치 (AI)</div>
+                    <div class="team-name" id="name-red">🐱 냥이 (AI)</div>
                     <div class="score" id="score-red">0</div>
                 </div>
             </div>
@@ -223,13 +223,13 @@
         <!-- 1P & 2P 파워 게이지 -->
         <div id="power-meter-container">
             <div class="meter-group">
-                <div class="meter-label" style="color:#60a5fa;">🦁 1P 라이언 파워 (Space)</div>
+                <div class="meter-label" style="color:#60a5fa;">🐻 1P 곰이 파워 (Space)</div>
                 <div class="meter-bar-bg">
                     <div id="meter-fill-p1" class="meter-fill-p1"></div>
                 </div>
             </div>
             <div class="meter-group" id="meter-group-p2" style="display:none;">
-                <div class="meter-label" style="color:#f472b6;">🍑 2P 어피치 파워 (Enter)</div>
+                <div class="meter-label" style="color:#f87171;">🐱 2P 냥이 파워 (Enter)</div>
                 <div class="meter-bar-bg">
                     <div id="meter-fill-p2" class="meter-fill-p2"></div>
                 </div>
@@ -245,14 +245,14 @@
         <!-- 하단 조작 가이드 -->
         <div class="bottom-panel">
             <div class="controls-card" id="control-guide-box">
-                <strong>[조작 가이드]</strong><br>
-                <span class="team-blue">● 1P 라이언 (BLUE 1):</span> <span class="key-badge">W,A,S,D</span> 이동 | <span class="key-badge">Space</span> 충전 후 뗌<br>
-                <span class="team-blue" id="guide-p2" style="display:none;">● 2P 무지 (BLUE 2):</span> <span class="key-badge">T,F,G,H</span> 이동 | <span class="key-badge">B</span> 충전 후 뗌<br>
-                <span class="team-red" id="guide-p3" style="display:none;">● 3P 어피치 (RED 1):</span> <span class="key-badge">방향키</span> 이동 | <span class="key-badge">Enter</span> 충전 후 뗌<br>
-                <span class="team-red" id="guide-p4" style="display:none;">● 4P 콘 (RED 2):</span> <span class="key-badge">I,J,K,L</span> 이동 | <span class="key-badge">O</span> 충전 후 뗌
+                <strong>[애니멀 배드민턴 조작 가이드]</strong><br>
+                <span class="team-blue">● 1P 곰이 (BLUE 1):</span> <span class="key-badge">W,A,S,D</span> 이동 | <span class="key-badge">Space</span> 충전 후 뗌<br>
+                <span class="team-blue" id="guide-p2" style="display:none;">● 2P 토순이 (BLUE 2):</span> <span class="key-badge">T,F,G,H</span> 이동 | <span class="key-badge">B</span> 충전 후 뗌<br>
+                <span class="team-red" id="guide-p3" style="display:none;">● 3P 냥이 (RED 1):</span> <span class="key-badge">방향키</span> 이동 | <span class="key-badge">Enter</span> 충전 후 뗌<br>
+                <span class="team-red" id="guide-p4" style="display:none;">● 4P 삐약이 (RED 2):</span> <span class="key-badge">I,J,K,L</span> 이동 | <span class="key-badge">O</span> 충전 후 뗌
             </div>
             <div style="font-size: 12.5px; color: #facc15; background: rgba(0,0,0,0.75); padding: 8px 12px; border-radius: 8px;">
-                🛑 <b>셔틀콕 정지:</b> 셔틀콕은 바닥에 닿는 순간 공처럼 구르지 않고 그 자리에 멈춥니다!
+                🛑 <b>셔틀콕 정지:</b> 바닥에 닿는 순간 깃털 콕처럼 공이 굴러가지 않고 자리에 딱 멈춥니다!
             </div>
         </div>
     </div>
@@ -261,7 +261,7 @@
     <div id="online-modal">
         <h3>📱 QR 코드 & 초대 링크 공유</h3>
         <p style="font-size: 12.5px; color: #cbd5e1; margin-bottom: 6px;">
-            친구가 <b>휴대폰 카메라</b>로 QR을 비추면 바로 방에 입장합니다!
+            친구가 <b>스마트폰 카메라</b>로 QR을 비추면 바로 방에 입장합니다!
         </p>
         <div id="qrcode-container"></div>
         <div style="margin: 4px 0;">
@@ -279,7 +279,7 @@
     </div>
 
     <script>
-        /* ================= 🔒 잠금/해금 관리 ================= */
+        /* ================= 🔒 모드 잠금/해금 관리 ================= */
         let isTutorialCompleted = false;
         try {
             isTutorialCompleted = localStorage.getItem('badminton_tut_cleared') === 'true';
@@ -328,7 +328,7 @@
             showRefereeCall("🎉 모든 모드 해금!", "축하합니다! 이제 AI 및 친구와의 모든 대전 모드를 즐길 수 있습니다.", 3500);
         }
 
-        /* ================= Web Audio 음향 ================= */
+        /* ================= Web Audio 사운드 ================= */
         let audioCtx = null;
         function getAudioContext() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -365,7 +365,7 @@
             } catch(e){}
         }
 
-        /* ================= 코트 규격 ================= */
+        /* ================= 배드민턴 코트 규격 ================= */
         const COURT_L = 13.4;
         const DOUBLES_W = 6.10;
         const SINGLES_W = 5.18;
@@ -452,7 +452,7 @@
         }
         function hideHighlightZone() { highlightMat.opacity = 0.0; }
 
-        /* ================= 🎨 100% 호환 둥근 사각형 헬퍼 ================= */
+        /* ================= 🎨 범용 곡선 헬퍼 (100% 브라우저 호환) ================= */
         function drawRoundedRect(ctx, x, y, w, h, r) {
             ctx.beginPath();
             ctx.moveTo(x + r, y);
@@ -464,100 +464,201 @@
             ctx.closePath();
         }
 
-        /* ================= 🎨 카카오프렌즈 캐릭터 텍스처 엔진 ================= */
-        function generateCharacterTexture(charType) {
+        /* ================= 🎨 100% 저작권 없는 오리지널 동물 캐릭터 ================= */
+        function generateOriginalCharacterTexture(charType) {
             const canvas = document.createElement('canvas');
             canvas.width = 256; canvas.height = 360;
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            if (charType === 'ryan') {
-                ctx.fillStyle = '#ea580c';
+            if (charType === 'bear') {
+                // 🐻 곰이 (갈색 스포츠 곰돌이)
+                // 귀
+                ctx.fillStyle = '#78350f';
                 ctx.beginPath(); ctx.arc(60, 95, 26, 0, Math.PI * 2); ctx.fill();
                 ctx.beginPath(); ctx.arc(196, 95, 26, 0, Math.PI * 2); ctx.fill();
-                ctx.fillStyle = '#f59e0b';
+                ctx.fillStyle = '#b45309';
+                ctx.beginPath(); ctx.arc(60, 95, 14, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(196, 95, 14, 0, Math.PI * 2); ctx.fill();
+
+                // 몸통
+                ctx.fillStyle = '#92400e';
                 drawRoundedRect(ctx, 65, 180, 126, 140, 24); ctx.fill();
-                ctx.fillStyle = '#ffffff';
+                // 밝은 배 패치
+                ctx.fillStyle = '#fef3c7';
                 ctx.beginPath(); ctx.arc(128, 235, 34, 0, Math.PI * 2); ctx.fill();
-                ctx.fillStyle = '#f59e0b';
+
+                // 머리
+                ctx.fillStyle = '#92400e';
                 ctx.beginPath(); ctx.arc(128, 120, 75, 0, Math.PI * 2); ctx.fill();
-                ctx.strokeStyle = '#18181b'; ctx.lineWidth = 7; ctx.lineCap = 'round';
-                ctx.beginPath(); ctx.moveTo(85, 95); ctx.lineTo(115, 95); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(141, 95); ctx.lineTo(171, 95); ctx.stroke();
-                ctx.fillStyle = '#18181b';
-                ctx.beginPath(); ctx.arc(100, 115, 6, 0, Math.PI * 2); ctx.fill();
-                ctx.beginPath(); ctx.arc(156, 115, 6, 0, Math.PI * 2); ctx.fill();
+
+                // 파란색 스포츠 헤어밴드
+                ctx.fillStyle = '#2563eb';
+                drawRoundedRect(ctx, 55, 82, 146, 22, 6); ctx.fill();
                 ctx.fillStyle = '#ffffff';
-                ctx.beginPath(); ctx.arc(118, 138, 15, 0, Math.PI * 2); ctx.fill();
-                ctx.beginPath(); ctx.arc(138, 138, 15, 0, Math.PI * 2); ctx.fill();
+                ctx.fillRect(116, 88, 24, 10);
+
+                // 반짝이는 눈
                 ctx.fillStyle = '#18181b';
-                ctx.beginPath(); ctx.arc(128, 130, 6, 0, Math.PI * 2); ctx.fill();
-            } else if (charType === 'muzi') {
-                ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#18181b'; ctx.lineWidth = 4;
-                ctx.beginPath(); ctx.ellipse(90, 60, 16, 50, -0.1, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-                ctx.beginPath(); ctx.ellipse(166, 60, 16, 50, 0.1, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-                ctx.fillStyle = '#f87171';
-                ctx.beginPath(); ctx.ellipse(90, 62, 9, 36, -0.1, 0, Math.PI * 2); ctx.fill();
-                ctx.beginPath(); ctx.ellipse(166, 62, 9, 36, 0.1, 0, Math.PI * 2); ctx.fill();
-                ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#18181b'; ctx.lineWidth = 4;
+                ctx.beginPath(); ctx.arc(98, 122, 7, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(158, 122, 7, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath(); ctx.arc(96, 120, 2.5, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(156, 120, 2.5, 0, Math.PI * 2); ctx.fill();
+
+                // 밝은 코/주둥이
+                ctx.fillStyle = '#fef3c7';
+                ctx.beginPath(); ctx.ellipse(128, 145, 26, 19, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#18181b';
+                ctx.beginPath(); ctx.ellipse(128, 138, 9, 6, 0, 0, Math.PI * 2); ctx.fill();
+
+                // 미소 입
+                ctx.strokeStyle = '#18181b'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+                ctx.beginPath(); ctx.moveTo(128, 144); ctx.lineTo(128, 153); ctx.stroke();
+                ctx.beginPath(); ctx.arc(122, 152, 6, 0, Math.PI * 0.85); ctx.stroke();
+                ctx.beginPath(); ctx.arc(134, 152, 6, Math.PI * 0.15, Math.PI); ctx.stroke();
+
+            } else if (charType === 'bunny') {
+                // 🐰 토순이 (하얀 순발력 토끼)
+                // 쫑긋한 토끼 귀
+                ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 4;
+                ctx.beginPath(); ctx.ellipse(90, 55, 18, 55, -0.1, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                ctx.beginPath(); ctx.ellipse(166, 55, 18, 55, 0.1, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#f472b6';
+                ctx.beginPath(); ctx.ellipse(90, 58, 10, 40, -0.1, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.ellipse(166, 58, 10, 40, 0.1, 0, Math.PI * 2); ctx.fill();
+
+                // 몸통
+                ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 4;
                 drawRoundedRect(ctx, 75, 190, 106, 130, 20); ctx.fill(); ctx.stroke();
-                ctx.fillStyle = '#facc15';
-                drawRoundedRect(ctx, 90, 310, 24, 40, 10); ctx.fill(); ctx.stroke();
-                drawRoundedRect(ctx, 142, 310, 24, 40, 10); ctx.fill(); ctx.stroke();
-                ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#18181b'; ctx.lineWidth = 4;
-                ctx.beginPath(); ctx.arc(128, 140, 72, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-                ctx.fillStyle = '#facc15';
-                ctx.beginPath(); ctx.arc(128, 140, 58, 0, Math.PI * 2); ctx.fill();
-                ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#18181b'; ctx.lineWidth = 3;
-                ctx.beginPath(); ctx.arc(104, 135, 15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-                ctx.beginPath(); ctx.arc(152, 135, 15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                // 하늘색 스포츠 조끼
+                ctx.fillStyle = '#38bdf8';
+                drawRoundedRect(ctx, 80, 200, 96, 75, 14); ctx.fill();
+
+                // 머리
+                ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 4;
+                ctx.beginPath(); ctx.arc(128, 140, 70, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+                // 발그레 볼터치
+                ctx.fillStyle = '#fbcfe8';
+                ctx.beginPath(); ctx.arc(88, 152, 12, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(168, 152, 12, 0, Math.PI * 2); ctx.fill();
+
+                // 초롱초롱한 눈
                 ctx.fillStyle = '#18181b';
-                ctx.beginPath(); ctx.arc(104, 135, 7, 0, Math.PI * 2); ctx.fill();
-                ctx.beginPath(); ctx.arc(152, 135, 7, 0, Math.PI * 2); ctx.fill();
-                ctx.beginPath(); ctx.arc(128, 150, 6, 0, Math.PI * 2); ctx.fill();
-            } else if (charType === 'apeach') {
-                ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#18181b'; ctx.lineWidth = 4;
-                drawRoundedRect(ctx, 85, 210, 86, 110, 18); ctx.fill(); ctx.stroke();
-                ctx.fillStyle = '#fbcfe8'; ctx.strokeStyle = '#18181b'; ctx.lineWidth = 4;
-                ctx.beginPath();
-                ctx.moveTo(128, 55);
-                ctx.bezierCurveTo(215, 65, 215, 195, 128, 205);
-                ctx.bezierCurveTo(41, 195, 41, 65, 128, 55);
-                ctx.fill(); ctx.stroke();
+                ctx.beginPath(); ctx.arc(102, 135, 8, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(154, 135, 8, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath(); ctx.arc(100, 133, 3, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(152, 133, 3, 0, Math.PI * 2); ctx.fill();
+
+                // 앙증맞은 코 & 입
+                ctx.fillStyle = '#fb7185';
+                ctx.beginPath(); ctx.ellipse(128, 146, 5, 4, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.strokeStyle = '#18181b'; ctx.lineWidth = 2.5;
+                ctx.beginPath(); ctx.arc(122, 154, 6, 0, Math.PI * 0.85); ctx.stroke();
+                ctx.beginPath(); ctx.arc(134, 154, 6, Math.PI * 0.15, Math.PI); ctx.stroke();
+
+            } else if (charType === 'cat') {
+                // 🐱 냥이 (주황색 날렵한 스포츠 고양이)
+                // 뾰족한 고양이 귀
+                ctx.fillStyle = '#ea580c';
+                ctx.beginPath(); ctx.moveTo(60, 110); ctx.lineTo(80, 45); ctx.lineTo(115, 85); ctx.fill();
+                ctx.beginPath(); ctx.moveTo(196, 110); ctx.lineTo(176, 45); ctx.lineTo(141, 85); ctx.fill();
+                ctx.fillStyle = '#fbcfe8';
+                ctx.beginPath(); ctx.moveTo(68, 105); ctx.lineTo(82, 58); ctx.lineTo(108, 88); ctx.fill();
+                ctx.beginPath(); ctx.moveTo(188, 105); ctx.lineTo(174, 58); ctx.lineTo(148, 88); ctx.fill();
+
+                // 몸통
+                ctx.fillStyle = '#f97316';
+                drawRoundedRect(ctx, 80, 190, 96, 120, 20); ctx.fill();
+                ctx.fillStyle = '#fff7ed';
+                ctx.beginPath(); ctx.ellipse(128, 240, 28, 38, 0, 0, Math.PI * 2); ctx.fill();
+
+                // 머리
+                ctx.fillStyle = '#f97316';
+                ctx.beginPath(); ctx.arc(128, 130, 72, 0, Math.PI * 2); ctx.fill();
+
+                // 빨간색 스포츠 헤어밴드
+                ctx.fillStyle = '#dc2626';
+                drawRoundedRect(ctx, 58, 92, 140, 22, 6); ctx.fill();
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(116, 98, 24, 10);
+
+                // 고양이 수염 (양쪽 2가닥)
+                ctx.strokeStyle = '#18181b'; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
+                ctx.beginPath(); ctx.moveTo(64, 142); ctx.lineTo(88, 145); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(62, 154); ctx.lineTo(88, 152); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(192, 142); ctx.lineTo(168, 145); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(194, 154); ctx.lineTo(168, 152); ctx.stroke();
+
+                // 자신감 넘치는 눈
+                ctx.fillStyle = '#18181b';
+                ctx.beginPath(); ctx.arc(100, 130, 8, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(156, 130, 8, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath(); ctx.arc(98, 128, 3, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(154, 128, 3, 0, Math.PI * 2); ctx.fill();
+
+                // 코 & 고양이 입 (:3 모양)
                 ctx.fillStyle = '#f43f5e';
-                ctx.beginPath(); ctx.ellipse(82, 162, 16, 9, 0, 0, Math.PI * 2); ctx.fill();
-                ctx.beginPath(); ctx.ellipse(174, 162, 16, 9, 0, 0, Math.PI * 2); ctx.fill();
-                ctx.fillStyle = '#18181b'; ctx.strokeStyle = '#18181b'; ctx.lineWidth = 3;
-                ctx.beginPath(); ctx.ellipse(98, 142, 15, 11, 0, 0, Math.PI * 2); ctx.stroke();
-                ctx.beginPath(); ctx.ellipse(158, 142, 15, 11, 0, 0, Math.PI * 2); ctx.stroke();
-                ctx.beginPath(); ctx.arc(98, 142, 5, 0, Math.PI * 2); ctx.fill();
-                ctx.beginPath(); ctx.arc(158, 142, 5, 0, Math.PI * 2); ctx.fill();
-                [88, 98, 108].forEach(x => { ctx.beginPath(); ctx.moveTo(x, 131); ctx.lineTo(x, 122); ctx.stroke(); });
-                [148, 158, 168].forEach(x => { ctx.beginPath(); ctx.moveTo(x, 131); ctx.lineTo(x, 122); ctx.stroke(); });
-                ctx.beginPath(); ctx.arc(128, 168, 7, 0.2, Math.PI - 0.2); ctx.stroke();
-            } else if (charType === 'con') {
-                ctx.fillStyle = '#16a34a'; ctx.strokeStyle = '#18181b'; ctx.lineWidth = 4;
-                drawRoundedRect(ctx, 85, 190, 86, 120, 16); ctx.fill(); ctx.stroke();
-                ctx.beginPath();
-                ctx.moveTo(110, 100); ctx.lineTo(60, 120); ctx.lineTo(60, 150);
-                ctx.lineTo(100, 160); ctx.lineTo(175, 160);
-                ctx.bezierCurveTo(195, 140, 195, 100, 110, 100);
-                ctx.fill(); ctx.stroke();
-                ctx.fillStyle = '#fde047'; ctx.strokeStyle = '#18181b'; ctx.lineWidth = 3;
-                ctx.beginPath(); ctx.ellipse(135, 118, 18, 24, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(124, 142); ctx.lineTo(132, 142); ctx.lineTo(128, 147); ctx.fill();
+                ctx.strokeStyle = '#18181b'; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.arc(122, 151, 6, 0, Math.PI * 0.9); ctx.stroke();
+                ctx.beginPath(); ctx.arc(134, 151, 6, Math.PI * 0.1, Math.PI); ctx.stroke();
+
+            } else if (charType === 'chick') {
+                // 🐥 삐약이 (노란색 깜찍한 병아리)
+                // 몸통 & 머리 (통통한 원형)
+                ctx.fillStyle = '#facc15';
+                drawRoundedRect(ctx, 75, 130, 106, 170, 48); ctx.fill();
+
+                // 머리 위 귀여운 새싹 깃털
+                ctx.strokeStyle = '#16a34a'; ctx.lineWidth = 4; ctx.lineCap = 'round';
+                ctx.beginPath(); ctx.arc(120, 115, 16, Math.PI * 1.2, Math.PI * 1.9); ctx.stroke();
+                ctx.beginPath(); ctx.arc(136, 115, 16, Math.PI * 1.1, Math.PI * 1.8); ctx.stroke();
+                ctx.fillStyle = '#22c55e';
+                ctx.beginPath(); ctx.ellipse(114, 102, 7, 12, -0.4, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.ellipse(142, 102, 7, 12, 0.4, 0, Math.PI * 2); ctx.fill();
+
+                // 날개
+                ctx.fillStyle = '#eab308';
+                ctx.beginPath(); ctx.ellipse(65, 210, 14, 28, 0.2, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.ellipse(191, 210, 14, 28, -0.2, 0, Math.PI * 2); ctx.fill();
+
+                // 오렌지 볼터치
+                ctx.fillStyle = '#fb923c';
+                ctx.beginPath(); ctx.arc(92, 185, 10, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(164, 185, 10, 0, Math.PI * 2); ctx.fill();
+
+                // 똘망똘망한 눈
                 ctx.fillStyle = '#18181b';
-                ctx.beginPath(); ctx.arc(135, 118, 8, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(104, 172, 8, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(152, 172, 8, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath(); ctx.arc(102, 169, 3, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(150, 169, 3, 0, Math.PI * 2); ctx.fill();
+
+                // 뾰족 오렌지 부리
+                ctx.fillStyle = '#ea580c';
+                ctx.beginPath();
+                ctx.moveTo(128, 172);
+                ctx.lineTo(138, 185);
+                ctx.lineTo(118, 185);
+                ctx.closePath();
+                ctx.fill();
             }
+
             return new THREE.CanvasTexture(canvas);
         }
 
         /* ================= 4인 플레이어 객체 생성 ================= */
         const players = [];
 
-        function createFriendPlayer(id, name, charType, team, initX, initZ) {
+        function createOriginalPlayer(id, name, charType, team, initX, initZ) {
             const root = new THREE.Group();
 
-            const charTex = generateCharacterTexture(charType);
+            const charTex = generateOriginalCharacterTexture(charType);
             const charMat = new THREE.MeshBasicMaterial({ map: charTex, transparent: true, side: THREE.DoubleSide });
             const charPlane = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 1.8), charMat);
             charPlane.position.y = 0.9;
@@ -592,10 +693,10 @@
             };
         }
 
-        players.push(createFriendPlayer(0, '라이언', 'ryan', 'BLUE', -3.8, 1.2));
-        players.push(createFriendPlayer(1, '무지', 'muzi', 'BLUE', -5.2, -1.2));
-        players.push(createFriendPlayer(2, '어피치', 'apeach', 'RED', 3.8, -1.2));
-        players.push(createFriendPlayer(3, '콘', 'con', 'RED', 5.2, 1.2));
+        players.push(createOriginalPlayer(0, '곰이', 'bear', 'BLUE', -3.8, 1.2));     // 1P
+        players.push(createOriginalPlayer(1, '토순이', 'bunny', 'BLUE', -5.2, -1.2));  // 2P
+        players.push(createOriginalPlayer(2, '냥이', 'cat', 'RED', 3.8, -1.2));       // 3P
+        players.push(createOriginalPlayer(3, '삐약이', 'chick', 'RED', 5.2, 1.2));    // 4P
 
         /* ================= 🎯 실시간 낙하 예측 마커 ================= */
         const landingMarkerGroup = new THREE.Group();
@@ -690,7 +791,7 @@
             document.getElementById('meter-group-p2').style.display = 'none';
             setActiveNav('btn-mode-tut');
 
-            document.getElementById('name-blue').innerText = '🦁 라이언 (훈련)';
+            document.getElementById('name-blue').innerText = '🐻 곰이 (훈련)';
             document.getElementById('name-red').innerText = '🎯 과녁';
 
             players[0].active = true; players[0].root.visible = true;
@@ -777,15 +878,15 @@
             startAIMatch();
         }
 
-        /* ================= 🤖 AI 대전 (라이언 VS 어피치) ================= */
+        /* ================= 🤖 AI 대전 (곰이 VS 냥이) ================= */
         function startAIMatch() {
             gameMode = 'VS_AI';
             tutCard.style.display = 'none';
             hideHighlightZone();
             setActiveNav('btn-mode-ai');
 
-            document.getElementById('name-blue').innerText = '🦁 라이언 (1P)';
-            document.getElementById('name-red').innerText = '🍑 어피치 (AI)';
+            document.getElementById('name-blue').innerText = '🐻 곰이 (1P)';
+            document.getElementById('name-red').innerText = '🐱 냥이 (AI)';
 
             players[0].active = true; players[0].root.visible = true;
             players[1].active = false; players[1].root.visible = false;
@@ -798,7 +899,7 @@
             document.getElementById('guide-p4').style.display = 'none';
 
             resetRally(true);
-            showRefereeCall("🦁 라이언 VS 🍑 어피치!", "AI 대전 시작! 바닥의 낙하 예측 마커로 이동하세요.", 2200);
+            showRefereeCall("🐻 곰이 VS 🐱 냥이!", "AI 싱글 대전 시작! 바닥의 낙하 예측 마커로 이동하세요.", 2200);
         }
 
         /* ================= 🏸 친구 단식(2P) & 👥 친구 복식(4P) ================= */
@@ -810,8 +911,8 @@
             const isD = (type === 'DOUBLES');
             setActiveNav(isD ? 'btn-mode-doubles' : 'btn-mode-singles');
 
-            document.getElementById('name-blue').innerText = isD ? '🦁 라이언 & 🐰 무지' : '🦁 라이언 (1P)';
-            document.getElementById('name-red').innerText = isD ? '🍑 어피치 & 🐊 콘' : '🍑 어피치 (2P)';
+            document.getElementById('name-blue').innerText = isD ? '🐻 곰이 & 🐰 토순이' : '🐻 곰이 (1P)';
+            document.getElementById('name-red').innerText = isD ? '🐱 냥이 & 🐥 삐약이' : '🐱 냥이 (2P)';
 
             players[0].active = true; players[0].root.visible = true;
             players[1].active = isD; players[1].root.visible = isD;
@@ -825,7 +926,7 @@
 
             resetRally(true);
             showRefereeCall(
-                isD ? "👥 프렌즈 4인 복식 경기 시작!" : "🏸 라이언 VS 어피치 (로컬 2P 단식)!",
+                isD ? "👥 애니멀 4인 복식 경기 시작!" : "🏸 곰이 VS 냥이 (로컬 2P 단식)!",
                 isD ? "1P(Space), 2P(B), 3P(Enter), 4P(O)로 4명 모두 플레이합니다." : "1P는 Space, 2P는 Enter로 충전하여 플레이합니다.",
                 2500
             );
@@ -1042,7 +1143,7 @@
             setTimeout(() => resetRally(false), 2000);
         }
 
-        /* ================= 🤖 어피치 AI 로직 ================= */
+        /* ================= 🤖 냥이 AI 로직 ================= */
         function aiServe() {
             if (gameState !== 'SERVE_READY' || serverSide !== 'RED') return;
             executeStroke(players[2], 0.65);
@@ -1135,7 +1236,7 @@
 
             if (!peer) {
                 mySimpleCode = Math.random().toString(36).substring(2, 6).toUpperCase();
-                const fullPeerId = "FRIENDS-" + mySimpleCode;
+                const fullPeerId = "ANIMAL-" + mySimpleCode;
 
                 try {
                     peer = new Peer(fullPeerId, peerConfig);
@@ -1169,7 +1270,6 @@
             const qrContainer = document.getElementById('qrcode-container');
             qrContainer.innerHTML = '';
             
-            // GitHub Pages 주소 기반 URL 자동 생성
             const baseUrl = window.location.origin + window.location.pathname;
             const joinUrl = baseUrl + '?room=' + mySimpleCode;
 
@@ -1204,7 +1304,7 @@
             if (input.length !== 4) { alert("4자리 방 코드를 정확히 입력하세요!"); return; }
 
             document.getElementById('online-connection-msg').innerText = "방 연결 시도 중...";
-            const targetPeerId = "FRIENDS-" + input;
+            const targetPeerId = "ANIMAL-" + input;
 
             if (!peer) peer = new Peer(peerConfig);
             peerConn = peer.connect(targetPeerId);
@@ -1222,8 +1322,8 @@
             hideHighlightZone();
             setActiveNav('btn-mode-online');
 
-            document.getElementById('name-blue').innerText = isHost ? "🦁 라이언 (나)" : "🍑 어피치 (친구)";
-            document.getElementById('name-red').innerText = isHost ? "🍑 어피치 (친구)" : "🦁 라이언 (나)";
+            document.getElementById('name-blue').innerText = isHost ? "🐻 곰이 (나)" : "🐱 냥이 (친구)";
+            document.getElementById('name-red').innerText = isHost ? "🐱 냥이 (친구)" : "🐻 곰이 (나)";
 
             players[1].active = false; players[1].root.visible = false;
             players[3].active = false; players[3].root.visible = false;
@@ -1360,6 +1460,7 @@
                         awardPoint(winner);
                     }
 
+                    // 🛑 바닥에 닿는 순간 즉시 속도를 0으로 하여 굴러가지 않고 멈춤
                     if (shuttle.y <= 0.08) {
                         shuttle.y = 0.08;
                         shuttle.vx = 0;
@@ -1404,12 +1505,11 @@
             try {
                 checkTutorialLock();
                 
-                // URL에 ?room=CODE 가 붙어있으면 자동 접속
                 const urlParams = new URLSearchParams(window.location.search);
                 const joinRoom = urlParams.get('room');
                 if (joinRoom) {
                     showRefereeCall("🌐 초대 방 접속 중...", "친구 방에 자동으로 연결합니다.", 3000);
-                    const targetPeerId = "FRIENDS-" + joinRoom.toUpperCase();
+                    const targetPeerId = "ANIMAL-" + joinRoom.toUpperCase();
                     peer = new Peer(peerConfig);
                     peer.on('open', () => {
                         peerConn = peer.connect(targetPeerId);
