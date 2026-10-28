@@ -96,22 +96,22 @@
         .btn-out { background: #dc2626; color: #fff; }
         .btn-out:hover { background: #b91c1c; transform: scale(1.04); }
 
-        /* 🌟 3칸 분할 파워 게이지 바 */
+        /* 🌟 경기장 밖(우측 하단)으로 이동된 3칸 분할 파워 게이지 바 */
         #power-meter-container {
-            position: absolute; bottom: 84px; left: 50%; transform: translateX(-50%);
-            background: rgba(15, 23, 42, 0.95); border: 2px solid #475569; border-radius: 16px;
-            padding: 8px 18px; display: flex; flex-direction: column; align-items: center; gap: 6px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.6); min-width: 320px;
+            position: absolute; bottom: 18px; right: 20px;
+            background: rgba(15, 23, 42, 0.96); border: 2px solid #38bdf8; border-radius: 14px;
+            padding: 9px 16px; display: flex; flex-direction: column; align-items: center; gap: 5px;
+            box-shadow: 0 4px 25px rgba(0,0,0,0.7); min-width: 290px; z-index: 100;
         }
         .power-sections-labels {
-            display: flex; justify-content: space-between; width: 100%; font-size: 10.5px; font-weight: bold;
+            display: flex; justify-content: space-between; width: 100%; font-size: 10px; font-weight: bold;
         }
         .sec-drop { color: #38bdf8; }
         .sec-drive { color: #facc15; }
         .sec-clear { color: #ef4444; }
 
         .meter-bar-wrapper {
-            position: relative; width: 100%; height: 16px; background: #1e293b;
+            position: relative; width: 100%; height: 14px; background: #1e293b;
             border-radius: 6px; overflow: hidden; border: 1px solid #64748b;
         }
         .meter-fill-bar {
@@ -122,7 +122,7 @@
             position: absolute; top: 0; bottom: 0; width: 2px; background: rgba(0,0,0,0.6); z-index: 2;
         }
         #current-tech-indicator {
-            font-size: 12px; font-weight: 900; color: #38bdf8;
+            font-size: 11.5px; font-weight: 800; color: #38bdf8;
         }
 
         #tech-popup {
@@ -145,10 +145,11 @@
         #referee-call { font-size: 21px; font-weight: 900; color: #fbbf24; margin-bottom: 4px; }
         #referee-explanation { font-size: 13px; color: #cbd5e1; line-height: 1.5; }
 
+        /* 하단 조작 가이드 (좌측 하단 배치) */
         .bottom-panel { pointer-events: auto; display: flex; justify-content: space-between; align-items: flex-end; width: 100%; }
         .controls-card {
             background: rgba(15, 23, 42, 0.92); padding: 10px 16px; border-radius: 10px; font-size: 11.5px;
-            line-height: 1.6; border: 1px solid #334155; max-width: 620px;
+            line-height: 1.6; border: 1px solid #334155; max-width: 500px;
         }
         .key-badge {
             background: #1e293b; border: 1px solid #64748b; border-radius: 4px;
@@ -195,7 +196,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <!-- QR Code 라이브러리 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <!-- 🌟 무결점 웹소켓 통신 Paho-MQTT (NAT/방화벽 100% 관통) -->
+    <!-- 🌟 무결점 웹소켓 통신 Paho-MQTT -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
 </head>
 <body>
@@ -253,12 +254,12 @@
         <!-- 기술 발동 팝업 -->
         <div id="tech-popup">SMASH!</div>
 
-        <!-- 🌟 3칸 분할 기술 파워게이지 바 -->
+        <!-- 🌟 화면 우측 하단(경기장 밖)으로 뺀 3구간 파워 게이지 바 -->
         <div id="power-meter-container">
             <div class="power-sections-labels">
-                <span class="sec-drop">1. 💧 드롭샷 (네트 앞)</span>
-                <span class="sec-drive">2. ⚡ 드라이브 (중간)</span>
-                <span class="sec-clear">3. 🚀 클리어/스매시 (맨 뒤)</span>
+                <span class="sec-drop">1. 💧 드롭샷</span>
+                <span class="sec-drive">2. ⚡ 드라이브</span>
+                <span class="sec-clear">3. 🚀 클리어/스매시</span>
             </div>
             <div class="meter-bar-wrapper">
                 <div class="meter-divider" style="left: 30%;"></div>
@@ -277,12 +278,10 @@
         <!-- 하단 조작 가이드 -->
         <div class="bottom-panel">
             <div class="controls-card" id="control-guide-box">
-                <strong>[세로 뷰 조작 가이드]</strong><br>
-                <span class="team-blue">● 곰이 (내 진영):</span> <span class="key-badge">W</span>전진 | <span class="key-badge">S</span>후퇴 | <span class="key-badge">A,D</span>좌우 | <span class="key-badge">Space</span> 충전 후 뗌<br>
-                <span class="team-red">● 냥이 (상대 진영):</span> AI 자동 플레이 (로컬 2P 시 <span class="key-badge">방향키</span> + <span class="key-badge">Enter</span>)
-            </div>
-            <div style="font-size: 12px; color: #facc15; background: rgba(0,0,0,0.75); padding: 8px 12px; border-radius: 8px;">
-                🏆 <b>경기 종료 규칙:</b> 11점 선취 승리! (10:10 듀스 시 2점 차, 최대 15점)
+                <strong>[조작 요령]</strong><br>
+                <span class="team-blue">● 내 조작:</span> <span class="key-badge">W,A,S,D</span> 이동 | <span class="key-badge">Space</span> 충전 후 뗌<br>
+                <span class="team-red">● 상대방:</span> 호스트는 🐻 곰이, 게스트는 🐱 냥이로 플레이합니다.<br>
+                💡 <b>서브 룰:</b> 점수를 획득한 팀이 다음 서브권을 무조건 가져갑니다!
             </div>
         </div>
     </div>
@@ -292,14 +291,14 @@
         <h3>📱 실시간 온라인 1:1 대전</h3>
         
         <div class="online-tab-btns">
-            <button class="tab-btn active" id="tab-host" onclick="switchOnlineTab('HOST')">방 만들기 (호스트)</button>
-            <button class="tab-btn" id="tab-join" onclick="switchOnlineTab('JOIN')">방 참가하기 (게스트)</button>
+            <button class="tab-btn active" id="tab-host" onclick="switchOnlineTab('HOST')">방 만들기 (호스트: 🐻 곰이)</button>
+            <button class="tab-btn" id="tab-join" onclick="switchOnlineTab('JOIN')">방 참가하기 (게스트: 🐱 냥이)</button>
         </div>
 
         <!-- 호스트 탭 -->
         <div id="panel-host-view">
             <p style="font-size: 12px; color: #cbd5e1; margin-bottom: 4px;">
-                친구가 <b>스마트폰으로 QR</b>을 찍거나 <b>초대 링크</b>를 클릭하면 즉시 연결됩니다!
+                친구가 <b>스마트폰으로 QR</b>을 찍거나 <b>초대 링크</b>를 클릭하면 1초 만에 연결됩니다!
             </p>
             <div id="qrcode-container"></div>
             <div>
@@ -431,23 +430,21 @@
         }
 
         /* ================= 🌟 세로형 배드민턴 코트 규격 ================= */
-        // Z축: 경기장 전장 (내 진영 +Z, 상대 진영 -Z, 네트 Z=0)
-        // X축: 경기장 폭 (좌우)
-        const COURT_L = 13.4; // Z축 -6.7 ~ 6.7
-        const DOUBLES_W = 6.10; // X축 -3.05 ~ 3.05
-        const SINGLES_W = 5.18; // X축 -2.59 ~ 2.59
+        const COURT_L = 13.4; 
+        const DOUBLES_W = 6.10; 
+        const SINGLES_W = 5.18; 
         const NET_H = 1.55;
-        const SHORT_SERV_Z = 1.98; // 숏서비스 라인 Z
-        const hL = COURT_L / 2; // 6.7
-        const hWD = DOUBLES_W / 2; // 3.05
-        const hWS = SINGLES_W / 2; // 2.59
-        const LONG_SERV_D_Z = hL - 0.76; // 5.94 (복식 롱서비스 라인)
+        const SHORT_SERV_Z = 1.98; 
+        const hL = COURT_L / 2; 
+        const hWD = DOUBLES_W / 2; 
+        const hWS = SINGLES_W / 2; 
+        const LONG_SERV_D_Z = hL - 0.76; 
 
-        /* ================= Three.js 세로형 3D 씬 구축 ================= */
+        /* ================= Three.js 씬 구축 ================= */
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x070d19);
 
-        // 🌟 세로 뷰 카메라: 선수(Z=12.5) 뒤에서 네트와 상대편을 내려다봄!
+        // 세로 뷰 카메라
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
         camera.position.set(0, 9.5, 12.5);
         camera.lookAt(0, 0.8, -1.0);
@@ -468,7 +465,7 @@
         dirLight.castShadow = true;
         scene.add(dirLight);
 
-        // 녹색 코트 바닥 (세로 배치: 폭 DOUBLES_W, 길이 COURT_L)
+        // 코트 바닥
         const courtMesh = new THREE.Mesh(
             new THREE.PlaneGeometry(DOUBLES_W, COURT_L),
             new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.6 })
@@ -477,7 +474,7 @@
         courtMesh.receiveShadow = true;
         scene.add(courtMesh);
 
-        // 네트 (Z=0 위치에 X축 방향으로 배치)
+        // 네트
         const netMesh = new THREE.Mesh(
             new THREE.PlaneGeometry(DOUBLES_W + 0.6, NET_H),
             new THREE.MeshStandardMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.75 })
@@ -493,7 +490,7 @@
             scene.add(post);
         });
 
-        // 세로 코트 라인 그리기
+        // 세로 코트 라인
         const lineMat = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
         function addLine(p1, p2) {
             const geo = new THREE.BufferGeometry().setFromPoints([
@@ -503,25 +500,21 @@
             scene.add(new THREE.Line(geo, lineMat));
         }
 
-        // 외곽 사이드라인 (복식 X = ±3.05, 단식 X = ±2.59)
         addLine([-hWD, -hL], [-hWD, hL]);
         addLine([hWD, -hL], [hWD, hL]);
-        addLine([-hWS, -hL], [-hWS, hL]); // 단식 안쪽선
+        addLine([-hWS, -hL], [-hWS, hL]); 
         addLine([hWS, -hL], [hWS, hL]);
 
-        // 가로 라인들 (Z축 기준)
-        addLine([-hWD, -hL], [hWD, -hL]); // 엔드라인 (상대 백코트)
-        addLine([-hWD, hL], [hWD, hL]);   // 엔드라인 (내 백코트)
-        addLine([-hWD, -LONG_SERV_D_Z], [hWD, -LONG_SERV_D_Z]); // 복식 롱서비스라인
+        addLine([-hWD, -hL], [hWD, -hL]); 
+        addLine([-hWD, hL], [hWD, hL]);   
+        addLine([-hWD, -LONG_SERV_D_Z], [hWD, -LONG_SERV_D_Z]); 
         addLine([-hWD, LONG_SERV_D_Z], [hWD, LONG_SERV_D_Z]);
-        addLine([-hWD, -SHORT_SERV_Z], [hWD, -SHORT_SERV_Z]);   // 숏서비스라인
+        addLine([-hWD, -SHORT_SERV_Z], [hWD, -SHORT_SERV_Z]);   
         addLine([-hWD, SHORT_SERV_Z], [hWD, SHORT_SERV_Z]);
 
-        // 중앙 서비스 라인 (X=0)
         addLine([0, -hL], [0, -SHORT_SERV_Z]);
         addLine([0, SHORT_SERV_Z], [0, hL]);
 
-        // 타겟 구역 하이라이트
         const highlightMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.0, side: THREE.DoubleSide });
         const highlightZone = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), highlightMat);
         highlightZone.rotation.x = -Math.PI / 2;
@@ -549,7 +542,7 @@
             ctx.closePath();
         }
 
-        /* ================= 🎨 오리지널 캐릭터 텍스처 (곰이 & 냥이) ================= */
+        /* ================= 🎨 캐릭터 텍스처 (곰이 & 냥이) ================= */
         function generateOriginalCharacterTexture(charType) {
             const canvas = document.createElement('canvas');
             canvas.width = 256; canvas.height = 360;
@@ -633,6 +626,7 @@
 
             const headFrame = new THREE.Mesh(new THREE.TorusGeometry(0.24, 0.02, 8, 16), new THREE.MeshStandardMaterial({ color: 0xe2e8f0 }));
             headFrame.position.set(0, 0.68, 0);
+            headFrame.rotation.y = Math.PI / 2;
             shoulderPivot.add(headFrame);
 
             shoulderPivot.rotation.x = -0.4;
@@ -648,9 +642,9 @@
             };
         }
 
-        // 곰이 (내 진영 +Z), 냥이 (상대 진영 -Z)
-        players.push(createVerticalPlayer(0, '곰이', 'bear', 'BLUE', 1.2, 4.2));   // 1P (나)
-        players.push(createVerticalPlayer(1, '냥이', 'cat', 'RED', -1.2, -4.2));   // 2P (상대 / AI)
+        // 1P: 곰이 (내 진영 +Z), 2P: 냥이 (상대 진영 -Z)
+        players.push(createVerticalPlayer(0, '곰이', 'bear', 'BLUE', 1.2, 4.2));   
+        players.push(createVerticalPlayer(1, '냥이', 'cat', 'RED', -1.2, -4.2));   
 
         /* ================= 🎯 실시간 낙하 예측 마커 ================= */
         const landingMarkerGroup = new THREE.Group();
@@ -763,10 +757,9 @@
             if (step === 1) {
                 tutBadge.innerText = "STEP 1/4: 단식 서브 위치";
                 tutTitle.innerText = "단식 서브 위치 & 대각선 원칙";
-                tutDesc.innerHTML = "0점(짝수)일 땐 <b>오른쪽 서비스 코트</b>에서 상대 대각선(왼쪽 너머)으로 서브합니다.<br><b>숏서비스 라인</b>을 넘겨 <b>푸른색 과녁</b> 안으로 서브를 넣으세요!<br><kbd class='key-badge'>Space</kbd>를 게이지 3칸(빨간색)까지 길게 눌렀다 떼면 멀리 날아갑니다!";
+                tutDesc.innerHTML = "0점(짝수)일 땐 <b>오른쪽 서비스 코트</b>에서 상대 대각선(왼쪽 너머)으로 서브합니다.<br><b>숏서비스 라인</b>을 넘겨 <b>푸른색 과녁</b> 안으로 서브를 넣으세요!<br>우측 하단의 파워 게이지 3칸(빨간색)까지 길게 눌렀다 떼면 멀리 날아갑니다!";
                 tutTarget.innerText = "목표: 대각선 단식 과녁 안으로 서브 넣기 (0 / 1)";
 
-                // 세로 코트 상대 대각선 구역 (X: -hWS ~ 0, Z: -hL ~ -SHORT_SERV_Z)
                 setHighlightZone(-hWS/2, -(hL + SHORT_SERV_Z)/2, hWS, (hL - SHORT_SERV_Z), 0.45, 0x38bdf8);
                 resetRallyToFixedServer();
             } else if (step === 2) {
@@ -775,7 +768,6 @@
                 tutDesc.innerHTML = "<b>단식:</b> 안쪽 좁은 사이드라인을 사용하며 길이는 맨 끝까지 사용합니다.<br><b>복식:</b> 바깥쪽 넓은 사이드라인을 사용하여 코트를 넓게 씁니다.<br><b>[상황 시연]:</b> 단식 경기 중 공이 사이드라인 사이에 떨어졌습니다. IN일까요, OUT일까요?";
                 tutTarget.innerText = "아래 버튼 중 올바른 판정을 선택하세요!";
                 
-                // 단식선과 복식선 사이 하이라이트
                 setHighlightZone(2.8, -3.5, (DOUBLES_W - SINGLES_W)/2, 3.5, 0.6, 0xfacc15);
                 quizContainer.style.display = 'flex';
 
@@ -794,14 +786,13 @@
             } else if (step === 4) {
                 tutBadge.innerText = "STEP 4/4: 점수 및 종료 룰";
                 tutTitle.innerText = "11점 랠리포인트제 & 듀스 규칙";
-                tutDesc.innerHTML = "• <b>랠리포인트제:</b> 서브권 상관없이 랠리에서 이긴 팀이 1점과 서브권을 가져옵니다.<br>• <b>11점 선취 세트 종료:</b> 11점을 먼저 낸 팀이 세트를 가져갑니다.<br>• <b>듀스(Deuce):</b> 10:10 동점 시 2점 차가 날 때까지 계속되며, 14:14에서는 15점을 먼저 낸 팀이 최종 승리합니다!";
+                tutDesc.innerHTML = "• <b>랠리포인트제:</b> 랠리를 이긴 팀이 1점과 함께 <b>다음 서브권을 무조건</b> 가져옵니다.<br>• <b>11점 선취 세트 종료:</b> 11점을 먼저 낸 팀이 세트를 가져갑니다.<br>• <b>듀스(Deuce):</b> 10:10 동점 시 2점 차가 날 때까지 계속되며, 14:14에서는 15점을 먼저 낸 팀이 최종 승리합니다!";
                 tutTarget.innerHTML = "<button class='action-btn' style='font-size:15px;padding:9px 22px;margin-top:6px;' onclick='finishTutorial()'>🏆 튜토리얼 완료 및 모든 모드 해금!</button>";
                 hideHighlightZone();
                 gameState = 'POINT_END';
             }
         }
 
-        // 서비스 코트 위치 고정 리셋
         function resetRallyToFixedServer() {
             serverSide = 'BLUE';
             gameState = 'SERVE_READY';
@@ -921,19 +912,22 @@
                 shuttle.x = players[0].x;
                 shuttle.z = players[0].z - 0.35;
                 shuttle.y = 1.0;
+                showRefereeCall("서브 준비", "🐻 곰이 서브 차례! Space를 눌러 서브하세요.", 1800);
             } else {
                 shuttle.x = players[1].x;
                 shuttle.z = players[1].z + 0.35;
                 shuttle.y = 1.0;
                 if (gameMode === 'VS_AI') {
-                    showRefereeCall("AI 서브 대기", "2초 후 AI 냥이가 서브합니다...", 1900);
-                    setTimeout(() => aiServe(), 2000);
+                    showRefereeCall("서브 준비", "🐱 냥이 서브 차례! 1.8초 후 서브합니다...", 1800);
+                    setTimeout(() => aiServe(), 1800);
+                } else if (gameMode === 'ONLINE' && !isHost) {
+                    showRefereeCall("서브 준비", "내 서브 차례! Space를 눌러 서브하세요.", 1800);
                 }
             }
             shuttle.mesh.position.set(shuttle.x, shuttle.y, shuttle.z);
         }
 
-        /* ================= 🌟 세로 코트 타구 실행 (3구간 기술 적용) ================= */
+        /* ================= 세로 코트 타구 실행 ================= */
         function executeStroke(player, powerRatio) {
             if (!player.active) return;
 
@@ -942,7 +936,7 @@
                     playSound('fault');
                     const winner = (player.team === 'BLUE') ? 'RED' : 'BLUE';
                     showRefereeCall("⚠️ 더블 터치 폴트!", `<b>[${player.name} 실점]</b> 공이 네트를 넘어가기 전에 2번 연속 쳤습니다.`);
-                    awardPoint(winner);
+                    awardPoint(winner, "⚠️ 더블 터치!");
                     return;
                 }
             }
@@ -952,9 +946,9 @@
 
             player.isSwinging = true;
             player.swingProgress = 0;
-            const dirZ = (player.team === 'BLUE') ? -1 : 1; // 블루는 -Z(앞)로, 레드는 +Z(뒤)로 침
+            const dirZ = (player.team === 'BLUE') ? -1 : 1; 
 
-            // A. 서브 대기
+            // 서브
             if (gameState === 'SERVE_READY') {
                 if (player.team === serverSide) {
                     gameState = 'IN_PLAY';
@@ -977,7 +971,7 @@
                 return;
             }
 
-            // B. 3구간 기술 발동 (타구 높이 & 파워 분할)
+            // 랠리 타구 (3구간 기술 적용)
             if (gameState === 'IN_PLAY' && shuttle.y <= 3.2) {
                 shuttle.isServe = false;
                 shuttle.lastHitTeam = player.team;
@@ -986,23 +980,22 @@
                 const shotHeight = shuttle.y;
 
                 if (powerRatio < 0.3) {
-                    // 💧 1구간 (0~30%): 드롭샷 / 헤어핀 -> 상대 네트 바로 앞(Z = ±1.2 부근)에 뚝 떨어뜨림!
+                    // 1구간: 드롭샷 (네트 바로 앞)
                     shuttle.vz = dirZ * 3.8;
                     shuttle.vy = 2.2;
                     shuttle.vx = (Math.random() - 0.5) * 1.2;
                     showTechPopup("DROP SHOT (네트 앞)", "#38bdf8");
                     playSound('hit');
                 } else if (powerRatio < 0.7) {
-                    // ⚡ 2구간 (30~70%): 드라이브 / 푸시 -> 네트 위를 스치듯 빠르게 중간 코트로 찌름!
+                    // 2구간: 드라이브 (중간 코트)
                     shuttle.vz = dirZ * 7.6;
                     shuttle.vy = 0.9;
                     shuttle.vx = (player.x > 0 ? -1 : 1) * 1.4;
                     showTechPopup("DRIVE PUSH!", "#facc15");
                     playSound('hit');
                 } else {
-                    // 🚀 3구간 (70~100%): 하이클리어 / 스매시 -> 상대 코트 맨 뒤 백코트(Z = ±6.2)까지 강타!
+                    // 3구간: 하이클리어 / 스매시 (맨 뒤 백코트)
                     if (shotHeight > 1.95) {
-                        // 높은 공은 내리꽂는 스매시!
                         player.swingType = 'smash';
                         shuttle.vz = dirZ * 9.2;
                         shuttle.vy = -1.2;
@@ -1010,9 +1003,8 @@
                         showTechPopup("SMASH!!", "#ef4444");
                         playSound('smash');
                     } else {
-                        // 높은 롱 하이클리어!
                         shuttle.vz = dirZ * 8.6;
-                        shuttle.vy = 5.2; // 체공시간 길게
+                        shuttle.vy = 5.2;
                         shuttle.vx = (player.x > 0 ? -1 : 1) * 1.2;
                         showTechPopup("HIGH CLEAR (맨 뒤 백코트)!", "#ef4444");
                         playSound('hit');
@@ -1021,7 +1013,7 @@
             }
         }
 
-        /* ================= 🛑 착지 및 판정 ================= */
+        /* ================= 🛑 착지 및 점수 판정 ================= */
         function judgeLanding(landingX, landingZ) {
             gameState = 'POINT_END';
             landingMarkerGroup.visible = false;
@@ -1030,7 +1022,6 @@
 
             if (gameMode === 'TUTORIAL') {
                 if (tutStep === 1) {
-                    // 상대 대각선 구역 (X < 0, Z < -SHORT_SERV_Z)
                     const inTarget = (landingX <= 0 && landingX >= -hWS - 0.2 && landingZ <= -SHORT_SERV_Z && landingZ >= -hL - 0.3);
                     if (inTarget && shuttle.lastHitTeam === 'BLUE') {
                         playSound('hit');
@@ -1057,52 +1048,61 @@
                 }
             }
 
+            // 서브 폴트 검사
             if (shuttle.isServe) {
                 const pastShort = (shuttle.lastHitTeam === 'BLUE') ? (landingZ < -SHORT_SERV_Z) : (landingZ > SHORT_SERV_Z);
                 const isDiag = (shuttle.serveOriginX * landingX) < 0;
 
                 if (!pastShort || !isDiag || !inBounds) {
-                    const winner = (shuttle.lastHitTeam === 'BLUE') ? 'RED' : 'BLUE';
+                    const scorer = (shuttle.lastHitTeam === 'BLUE') ? 'RED' : 'BLUE';
                     playSound('fault');
-                    showRefereeCall("⚠️ 서브 폴트", "서브가 숏서비스 라인을 넘지 못했거나 대각선이 아닙니다.");
-                    awardPoint(winner);
+                    showRefereeCall("⚠️ 서브 폴트", "서브 실패! 상대방에게 득점과 서브권이 넘어갑니다.");
+                    awardPoint(scorer);
                     return;
                 }
             }
 
+            // 🌟 랠리 포인트제 공식 판정: 무조건 득점자가 다음 서브권 획득!
             if (inBounds) {
-                const landingTeam = (landingZ > 0) ? 'BLUE' : 'RED';
-                const winner = (landingTeam === 'BLUE') ? 'RED' : 'BLUE';
-                showRefereeCall("🟢 인 (IN) - 득점!", `코트 안에 착지했습니다.<br><b>[${winner === 'BLUE' ? '곰이' : '냥이'} 득점!]</b>`);
-                awardPoint(winner);
+                // 코트 안에 착지 -> 공이 떨어진 쪽 진영의 상대방이 득점!
+                const scorer = (landingZ < 0) ? 'BLUE' : 'RED';
+                awardPoint(scorer, `🟢 인 (IN) - ${scorer === 'BLUE' ? '🐻 곰이' : '🐱 냥이'} 득점! 다음 서브권을 가져옵니다.`);
             } else {
-                const winner = (shuttle.lastHitTeam === 'BLUE') ? 'RED' : 'BLUE';
+                // 코트 밖으로 아웃 -> 마지막으로 친 사람의 상대방이 득점!
+                const scorer = (shuttle.lastHitTeam === 'BLUE') ? 'RED' : 'BLUE';
                 playSound('fault');
-                showRefereeCall("🔴 아웃 (OUT) - 실점!", `코트 밖으로 벗어났습니다.<br><b>[${winner === 'BLUE' ? '곰이' : '냥이'} 득점!]</b>`);
-                awardPoint(winner);
+                awardPoint(scorer, `🔴 아웃 (OUT) - ${scorer === 'BLUE' ? '🐻 곰이' : '🐱 냥이'} 득점! 다음 서브권을 가져옵니다.`);
             }
         }
 
-        /* ================= 🏆 11점 세트 종료 및 리셋 ================= */
-        function awardPoint(winner) {
+        /* ================= 🏆 11점 세트 종료 및 득점자 서브 ================= */
+        function awardPoint(winner, reasonMsg="") {
             if (winner === 'BLUE') scoreBlue++;
             else scoreRed++;
+            
+            // 🌟 점수를 획득한 플레이어가 무조건 다음 서브권 획득!
             serverSide = winner;
             updateScoreboard();
 
+            if (reasonMsg) {
+                showRefereeCall("득점 판정!", reasonMsg, 2000);
+            }
+
+            // 11점 선취 & 듀스(최대 15점)
             if (scoreBlue >= 11 || scoreRed >= 11) {
                 const diff = Math.abs(scoreBlue - scoreRed);
                 if (diff >= 2 || scoreBlue === 15 || scoreRed === 15) {
-                    showRefereeCall("🏆 GAME SET!", `<b>${winner === 'BLUE' ? '곰이' : '냥이'} 11점 달성 최종 승리!</b>`, 4000);
+                    showRefereeCall("🏆 GAME SET!", `<b>${winner === 'BLUE' ? '🐻 곰이' : '🐱 냥이'} 11점 달성 최종 승리!</b>`, 4000);
                     setTimeout(() => resetRally(true), 4000);
                     return;
                 }
             }
 
+            // 점수 후 서브 대기 위치로 즉시 리셋
             setTimeout(() => resetRally(false), 1600);
         }
 
-        /* ================= 🤖 영리해진 세로 AI 풋워크 ================= */
+        /* ================= 🤖 AI 풋워크 ================= */
         function aiServe() {
             if (gameState !== 'SERVE_READY' || serverSide !== 'RED') return;
             const power = (aiDifficulty === 'EASY') ? 0.25 : 0.8;
@@ -1115,13 +1115,12 @@
 
             if (gameState === 'IN_PLAY') {
                 let targetX = 0.0;
-                let targetZ = -4.2; // 홈 포지션
+                let targetZ = -4.2; 
                 let aiSpeed = 3.6;
 
                 if (aiDifficulty === 'EASY') aiSpeed = 2.4;
                 else if (aiDifficulty === 'HARD') aiSpeed = 4.8;
 
-                // 공이 AI 진영으로 넘어올 때: 예측 지점으로 앞뒤 풋워크!
                 if (shuttle.vz < 0) {
                     const landing = calculateLandingSpot(shuttle);
                     targetX = Math.max(-2.2, Math.min(2.2, landing.x));
@@ -1136,7 +1135,7 @@
                 if (dist < 2.0 && shuttle.y <= 2.5 && shuttle.vz < 0) {
                     if (aiDifficulty === 'EASY') {
                         if (Math.random() < 0.15) return;
-                        executeStroke(ai, 0.25); // 쉬운 찬스볼 제공
+                        executeStroke(ai, 0.25);
                     } else if (aiDifficulty === 'NORMAL') {
                         const aiPower = (shuttle.z < -4.8) ? 0.85 : 0.5;
                         executeStroke(ai, aiPower);
@@ -1148,7 +1147,14 @@
             }
         }
 
-        /* ================= 키 입력 & 3구간 파워 충전 ================= */
+        /* ================= 🎮 내 캐릭터 식별 및 키 조작 ================= */
+        function getMyPlayer() {
+            if (gameMode === 'ONLINE' && !isHost) {
+                return players[1]; // 게스트는 🐱 냥이 조작!
+            }
+            return players[0]; // 호스트 및 싱글플레이는 🐻 곰이 조작!
+        }
+
         const keys = {};
 
         function updatePowerGauge(elapsed) {
@@ -1157,11 +1163,11 @@
 
             const indicator = document.getElementById('current-tech-indicator');
             if (ratio < 30) {
-                indicator.innerHTML = "<span class='sec-drop'>[1구간] 💧 드롭샷 / 헤어핀 (네트 앞)</span>";
+                indicator.innerHTML = "<span class='sec-drop'>[1구간] 💧 드롭샷 (네트 앞)</span>";
             } else if (ratio < 70) {
-                indicator.innerHTML = "<span class='sec-drive'>[2구간] ⚡ 드라이브 / 푸시 (중간 코트)</span>";
+                indicator.innerHTML = "<span class='sec-drive'>[2구간] ⚡ 드라이브 (중간 코트)</span>";
             } else {
-                indicator.innerHTML = "<span class='sec-clear'>[3구간] 🚀 하이클리어 / 💥 스매시 (맨 뒤 백코트)</span>";
+                indicator.innerHTML = "<span class='sec-clear'>[3구간] 🚀 하이클리어 / 스매시 (맨 뒤 백코트)</span>";
             }
         }
 
@@ -1172,11 +1178,13 @@
             keys[e.key.toLowerCase()] = true;
             keys[e.code] = true;
 
-            if ((e.key === ' ' || e.code === 'Space') && !players[0].isCharging) {
-                players[0].isCharging = true;
-                players[0].chargeStartTime = performance.now();
+            const myP = getMyPlayer();
+            if ((e.key === ' ' || e.code === 'Space') && !myP.isCharging) {
+                myP.isCharging = true;
+                myP.chargeStartTime = performance.now();
             }
 
+            // 로컬 2P 대전 시 Enter키
             if (e.key === 'Enter' && !players[1].isCharging && gameMode === 'SINGLES') {
                 players[1].isCharging = true;
                 players[1].chargeStartTime = performance.now();
@@ -1187,18 +1195,22 @@
             keys[e.key.toLowerCase()] = false;
             keys[e.code] = false;
 
-            if ((e.key === ' ' || e.code === 'Space') && players[0].isCharging) {
-                const elapsed = performance.now() - players[0].chargeStartTime;
+            const myP = getMyPlayer();
+            if ((e.key === ' ' || e.code === 'Space') && myP.isCharging) {
+                const elapsed = performance.now() - myP.chargeStartTime;
                 const ratio = Math.min(1.0, elapsed / 650);
-                players[0].isCharging = false;
+                myP.isCharging = false;
                 document.getElementById('meter-fill-bar').style.width = '0%';
                 document.getElementById('current-tech-indicator').innerText = '충전 대기 중...';
                 
-                executeStroke(players[0], ratio);
+                executeStroke(myP, ratio);
 
-                // 온라인 모드 시 타구 정보 전송
                 if (gameMode === 'ONLINE' && mqttClient && isMqttConnected) {
-                    sendMqttMessage({ type: 'stroke', power: ratio, x: players[0].x, z: players[0].z });
+                    if (isHost) {
+                        sendMqttMessage({ type: 'host_stroke', power: ratio });
+                    } else {
+                        sendMqttMessage({ type: 'guest_stroke', power: ratio });
+                    }
                 }
             }
 
@@ -1210,7 +1222,7 @@
             }
         });
 
-        /* ================= 🌐 100% 연결 보장 Paho-MQTT 웹소켓 엔진 ================= */
+        /* ================= 🌐 Paho-MQTT 웹소켓 엔진 ================= */
         let mqttClient = null;
         let isMqttConnected = false;
         let isHost = false;
@@ -1261,7 +1273,7 @@
         function copyInviteUrl() {
             const joinUrl = window.location.origin + window.location.pathname + '?room=' + currentRoomCode;
             navigator.clipboard.writeText(joinUrl).then(() => {
-                alert("초대 링크가 복사되었습니다! 카톡 등에 보내세요:\n" + joinUrl);
+                alert("초대 링크가 복사되었습니다! 친구에게 보내세요:\n" + joinUrl);
             });
         }
 
@@ -1271,7 +1283,6 @@
 
             document.getElementById('online-connection-msg').innerText = "웹소켓 브로커 연결 중...";
 
-            // EMQX 공용 SSL 웹소켓 (포트 8084)
             const clientId = "bm_" + (isHost ? "h_" : "g_") + Math.random().toString(36).substr(2, 6);
             mqttClient = new Paho.MQTT.Client("broker.emqx.io", 8084, "/mqtt", clientId);
 
@@ -1303,7 +1314,7 @@
                     }
                 },
                 onFailure: err => {
-                    document.getElementById('online-connection-msg').innerHTML = "<span style='color:#ef4444;'>브로커 연결 실패 (다시 시도해주세요)</span>";
+                    document.getElementById('online-connection-msg').innerHTML = "<span style='color:#ef4444;'>연결 실패 (다시 시도해주세요)</span>";
                 }
             });
         }
@@ -1330,13 +1341,17 @@
             } else if (!isHost && data.type === 'sync') {
                 shuttle.x = data.sx; shuttle.y = data.sy; shuttle.z = data.sz;
                 players[0].x = data.p0x; players[0].z = data.p0z;
+                players[0].root.position.set(players[0].x, 0, players[0].z);
                 scoreBlue = data.sb; scoreRed = data.sr;
+                serverSide = data.serverSide;
                 updateScoreboard();
             } else if (isHost && data.type === 'guest_move') {
                 players[1].x = data.x; players[1].z = data.z;
-            } else if (data.type === 'stroke') {
-                const hitter = (isHost) ? players[1] : players[0];
-                executeStroke(hitter, data.power);
+                players[1].root.position.set(players[1].x, 0, players[1].z);
+            } else if (isHost && data.type === 'guest_stroke') {
+                executeStroke(players[1], data.power);
+            } else if (!isHost && data.type === 'host_stroke') {
+                executeStroke(players[0], data.power);
             }
         }
 
@@ -1348,8 +1363,9 @@
             setActiveNav('btn-mode-online');
             document.getElementById('ai-diff-selector').style.display = 'none';
 
-            document.getElementById('name-blue').innerText = isHost ? "🐻 곰이 (나)" : "🐱 냥이 (친구)";
-            document.getElementById('name-red').innerText = isHost ? "🐱 냥이 (친구)" : "🐻 곰이 (나)";
+            // 호스트는 곰이(BLUE), 게스트는 냥이(RED)
+            document.getElementById('name-blue').innerText = isHost ? "🐻 곰이 (나)" : "🐻 곰이 (친구)";
+            document.getElementById('name-red').innerText = isHost ? "🐱 냥이 (친구)" : "🐱 냥이 (나)";
 
             players[0].active = true; players[0].root.visible = true;
             players[1].active = true; players[1].root.visible = true;
@@ -1364,12 +1380,13 @@
         function animate() {
             const dt = Math.min(clock.getDelta(), 0.05);
 
-            if (players[0].isCharging) {
-                const elapsed = performance.now() - players[0].chargeStartTime;
+            const myP = getMyPlayer();
+            if (myP.isCharging) {
+                const elapsed = performance.now() - myP.chargeStartTime;
                 updatePowerGauge(elapsed);
             }
 
-            // 세로 코트 이동 제어
+            // 이동 제어
             function move(p, dx, dz, minZ, maxZ) {
                 if (!p.active) return;
                 p.x = Math.max(-hWS, Math.min(hWS, p.x + dx * p.speed * dt));
@@ -1377,24 +1394,35 @@
                 p.root.position.set(p.x, 0, p.z);
             }
 
-            // 1P 곰이 (WASD: W가 앞(-Z), S가 뒤(+Z))
-            let b1x = (keys['d'] ? 1 : 0) - (keys['a'] ? 1 : 0);
-            let b1z = (keys['s'] ? 1 : 0) - (keys['w'] ? 1 : 0);
-            move(players[0], b1x, b1z, 0.4, hL);
+            if (gameMode === 'ONLINE') {
+                if (isHost) {
+                    // 호스트는 곰이(내 진영) 조작
+                    let b1x = (keys['d'] ? 1 : 0) - (keys['a'] ? 1 : 0);
+                    let b1z = (keys['s'] ? 1 : 0) - (keys['w'] ? 1 : 0);
+                    move(players[0], b1x, b1z, 0.4, hL);
+                } else {
+                    // 게스트는 냥이(상대 진영) 조작!
+                    let g1x = (keys['d'] ? 1 : 0) - (keys['a'] ? 1 : 0);
+                    let g1z = (keys['s'] ? 1 : 0) - (keys['w'] ? 1 : 0);
+                    move(players[1], g1x, g1z, -hL, -0.4);
+                    if (isMqttConnected) {
+                        sendMqttMessage({ type: 'guest_move', x: players[1].x, z: players[1].z });
+                    }
+                }
+            } else {
+                // 싱글 / 튜토리얼 / AI
+                let b1x = (keys['d'] ? 1 : 0) - (keys['a'] ? 1 : 0);
+                let b1z = (keys['s'] ? 1 : 0) - (keys['w'] ? 1 : 0);
+                move(players[0], b1x, b1z, 0.4, hL);
 
-            // 로컬 2P (방향키: Up이 앞(+Z), Down이 뒤(-Z))
-            if (gameMode === 'SINGLES') {
-                let r1x = (keys['arrowright'] ? 1 : 0) - (keys['arrowleft'] ? 1 : 0);
-                let r1z = (keys['arrowup'] ? 1 : 0) - (keys['arrowdown'] ? 1 : 0);
-                move(players[1], r1x, r1z, -hL, -0.4);
+                if (gameMode === 'SINGLES') {
+                    let r1x = (keys['arrowright'] ? 1 : 0) - (keys['arrowleft'] ? 1 : 0);
+                    let r1z = (keys['arrowup'] ? 1 : 0) - (keys['arrowdown'] ? 1 : 0);
+                    move(players[1], r1x, r1z, -hL, -0.4);
+                }
+
+                if (gameMode === 'VS_AI') updateAI(dt);
             }
-
-            // 온라인 게스트 이동 정보 전송
-            if (gameMode === 'ONLINE' && !isHost && isMqttConnected) {
-                sendMqttMessage({ type: 'guest_move', x: players[1].x, z: players[1].z });
-            }
-
-            if (gameMode === 'VS_AI') updateAI(dt);
 
             // 라켓 스윙 모션
             players.forEach(p => {
@@ -1409,7 +1437,7 @@
                 }
             });
 
-            // 🛑 셔틀콕 물리 처리 (세로 축 기준)
+            // 🛑 셔틀콕 물리 처리 (호스트 또는 오프라인 환경)
             if (gameMode !== 'ONLINE' || isHost) {
                 if (gameState === 'IN_PLAY') {
                     shuttle.vy -= 8.8 * dt;
@@ -1438,22 +1466,19 @@
                         outerRing.material.color.setHex(0xf59e0b);
                     }
 
-                    // 네트 건넘 판정 (Z=0 통과)
                     if ((shuttle.lastHitTeam === 'BLUE' && shuttle.z < 0) ||
                         (shuttle.lastHitTeam === 'RED' && shuttle.z > 0)) {
                         shuttle.hasCrossedNet = true;
                     }
 
-                    // 네트 걸림 검사 (Z=0 부근에서 높이가 네트보다 낮을 때)
                     if (Math.abs(shuttle.z) < 0.16 && shuttle.y < NET_H) {
                         playSound('fault');
                         const faultTeam = shuttle.lastHitTeam;
                         const winner = (faultTeam === 'BLUE') ? 'RED' : 'BLUE';
                         showRefereeCall("⚠️ 네트 걸림", "셔틀콕이 네트를 넘지 못했습니다.");
-                        awardPoint(winner);
+                        awardPoint(winner, "네트 걸림!");
                     }
 
-                    // 바닥 착지 시 즉각 정지
                     if (shuttle.y <= 0.08) {
                         shuttle.y = 0.08;
                         shuttle.vx = 0;
@@ -1469,13 +1494,14 @@
                     shuttle.y = 1.0 + Math.sin(Date.now() * 0.005) * 0.04;
                 }
 
-                // 온라인 호스트 동기화
+                // 온라인 상태 동기화
                 if (gameMode === 'ONLINE' && isHost && isMqttConnected) {
                     sendMqttMessage({
                         type: 'sync',
                         sx: shuttle.x, sy: shuttle.y, sz: shuttle.z,
                         p0x: players[0].x, p0z: players[0].z,
-                        sb: scoreBlue, sr: scoreRed
+                        sb: scoreBlue, sr: scoreRed,
+                        serverSide: serverSide
                     });
                 }
             }
@@ -1494,7 +1520,7 @@
             }
         });
 
-        // 🌟 브라우저 안전 구동 및 URL 자동 참가
+        // 시작
         function bootGame() {
             try {
                 checkTutorialLock();
