@@ -65,11 +65,11 @@
             padding: 3px 12px; border-radius: 20px; letter-spacing: 1px;
         }
         .tut-skip-btn {
-            background: #334155; border: 1px solid #475569; color: #38bdf8; font-size: 11.5px;
-            font-weight: bold; padding: 4px 12px; border-radius: 6px; cursor: pointer; transition: 0.2s;
+            background: #1e293b; border: 1px solid #38bdf8; color: #38bdf8; font-size: 12px;
+            font-weight: bold; padding: 5px 14px; border-radius: 8px; cursor: pointer; transition: 0.2s;
         }
-        .tut-skip-btn:hover { background: #475569; color: #fff; }
-        #tut-title { font-size: 17px; color: #facc15; font-weight: 800; margin-bottom: 5px; }
+        .tut-skip-btn:hover { background: #38bdf8; color: #070d19; }
+        #tut-title { font-size: 17.5px; color: #facc15; font-weight: 800; margin-bottom: 5px; }
         #tut-desc { font-size: 13.5px; color: #e2e8f0; line-height: 1.5; margin-bottom: 8px; }
         #tut-target { font-size: 13px; color: #38bdf8; font-weight: bold; }
 
@@ -85,7 +85,7 @@
         .btn-out { background: #dc2626; color: #fff; }
         .btn-out:hover { background: #b91c1c; transform: scale(1.04); }
 
-        /* 1P & 2P 파워 게이지 */
+        /* 하단 파워 게이지 바 */
         #power-meter-container {
             position: absolute; bottom: 84px; left: 50%; transform: translateX(-50%);
             background: rgba(15, 23, 42, 0.92); border: 2px solid #475569; border-radius: 20px;
@@ -115,7 +115,7 @@
         #referee-alert {
             position: absolute; top: 46%; left: 50%; transform: translate(-50%, -50%);
             background: rgba(15, 23, 42, 0.96); padding: 15px 24px; border-radius: 14px;
-            display: none; text-align: center; border: 2px solid #f59e0b; max-width: 460px;
+            display: none; text-align: center; border: 2px solid #f59e0b; max-width: 480px;
             box-shadow: 0 15px 40px rgba(0,0,0,0.9); z-index: 50;
         }
         #referee-call { font-size: 21px; font-weight: 900; color: #fbbf24; margin-bottom: 4px; }
@@ -158,7 +158,7 @@
         .action-btn:hover { background: #059669; }
     </style>
 
-    <!-- Three.js (이중 안정 CDN) -->
+    <!-- Three.js 안정 CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
         if (typeof THREE === 'undefined') {
@@ -452,7 +452,7 @@
         }
         function hideHighlightZone() { highlightMat.opacity = 0.0; }
 
-        /* ================= 🎨 범용 곡선 헬퍼 (100% 브라우저 호환) ================= */
+        /* ================= 🎨 범용 곡선 헬퍼 ================= */
         function drawRoundedRect(ctx, x, y, w, h, r) {
             ctx.beginPath();
             ctx.moveTo(x + r, y);
@@ -472,8 +472,6 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             if (charType === 'bear') {
-                // 🐻 곰이 (갈색 스포츠 곰돌이)
-                // 귀
                 ctx.fillStyle = '#78350f';
                 ctx.beginPath(); ctx.arc(60, 95, 26, 0, Math.PI * 2); ctx.fill();
                 ctx.beginPath(); ctx.arc(196, 95, 26, 0, Math.PI * 2); ctx.fill();
@@ -481,24 +479,19 @@
                 ctx.beginPath(); ctx.arc(60, 95, 14, 0, Math.PI * 2); ctx.fill();
                 ctx.beginPath(); ctx.arc(196, 95, 14, 0, Math.PI * 2); ctx.fill();
 
-                // 몸통
                 ctx.fillStyle = '#92400e';
                 drawRoundedRect(ctx, 65, 180, 126, 140, 24); ctx.fill();
-                // 밝은 배 패치
                 ctx.fillStyle = '#fef3c7';
                 ctx.beginPath(); ctx.arc(128, 235, 34, 0, Math.PI * 2); ctx.fill();
 
-                // 머리
                 ctx.fillStyle = '#92400e';
                 ctx.beginPath(); ctx.arc(128, 120, 75, 0, Math.PI * 2); ctx.fill();
 
-                // 파란색 스포츠 헤어밴드
                 ctx.fillStyle = '#2563eb';
                 drawRoundedRect(ctx, 55, 82, 146, 22, 6); ctx.fill();
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(116, 88, 24, 10);
 
-                // 반짝이는 눈
                 ctx.fillStyle = '#18181b';
                 ctx.beginPath(); ctx.arc(98, 122, 7, 0, Math.PI * 2); ctx.fill();
                 ctx.beginPath(); ctx.arc(158, 122, 7, 0, Math.PI * 2); ctx.fill();
@@ -506,21 +499,17 @@
                 ctx.beginPath(); ctx.arc(96, 120, 2.5, 0, Math.PI * 2); ctx.fill();
                 ctx.beginPath(); ctx.arc(156, 120, 2.5, 0, Math.PI * 2); ctx.fill();
 
-                // 밝은 코/주둥이
                 ctx.fillStyle = '#fef3c7';
                 ctx.beginPath(); ctx.ellipse(128, 145, 26, 19, 0, 0, Math.PI * 2); ctx.fill();
                 ctx.fillStyle = '#18181b';
                 ctx.beginPath(); ctx.ellipse(128, 138, 9, 6, 0, 0, Math.PI * 2); ctx.fill();
 
-                // 미소 입
                 ctx.strokeStyle = '#18181b'; ctx.lineWidth = 3; ctx.lineCap = 'round';
                 ctx.beginPath(); ctx.moveTo(128, 144); ctx.lineTo(128, 153); ctx.stroke();
                 ctx.beginPath(); ctx.arc(122, 152, 6, 0, Math.PI * 0.85); ctx.stroke();
                 ctx.beginPath(); ctx.arc(134, 152, 6, Math.PI * 0.15, Math.PI); ctx.stroke();
 
             } else if (charType === 'bunny') {
-                // 🐰 토순이 (하얀 순발력 토끼)
-                // 쫑긋한 토끼 귀
                 ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 4;
                 ctx.beginPath(); ctx.ellipse(90, 55, 18, 55, -0.1, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
                 ctx.beginPath(); ctx.ellipse(166, 55, 18, 55, 0.1, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
@@ -528,23 +517,18 @@
                 ctx.beginPath(); ctx.ellipse(90, 58, 10, 40, -0.1, 0, Math.PI * 2); ctx.fill();
                 ctx.beginPath(); ctx.ellipse(166, 58, 10, 40, 0.1, 0, Math.PI * 2); ctx.fill();
 
-                // 몸통
                 ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 4;
                 drawRoundedRect(ctx, 75, 190, 106, 130, 20); ctx.fill(); ctx.stroke();
-                // 하늘색 스포츠 조끼
                 ctx.fillStyle = '#38bdf8';
                 drawRoundedRect(ctx, 80, 200, 96, 75, 14); ctx.fill();
 
-                // 머리
                 ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 4;
                 ctx.beginPath(); ctx.arc(128, 140, 70, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
 
-                // 발그레 볼터치
                 ctx.fillStyle = '#fbcfe8';
                 ctx.beginPath(); ctx.arc(88, 152, 12, 0, Math.PI * 2); ctx.fill();
                 ctx.beginPath(); ctx.arc(168, 152, 12, 0, Math.PI * 2); ctx.fill();
 
-                // 초롱초롱한 눈
                 ctx.fillStyle = '#18181b';
                 ctx.beginPath(); ctx.arc(102, 135, 8, 0, Math.PI * 2); ctx.fill();
                 ctx.beginPath(); ctx.arc(154, 135, 8, 0, Math.PI * 2); ctx.fill();
@@ -552,7 +536,6 @@
                 ctx.beginPath(); ctx.arc(100, 133, 3, 0, Math.PI * 2); ctx.fill();
                 ctx.beginPath(); ctx.arc(152, 133, 3, 0, Math.PI * 2); ctx.fill();
 
-                // 앙증맞은 코 & 입
                 ctx.fillStyle = '#fb7185';
                 ctx.beginPath(); ctx.ellipse(128, 146, 5, 4, 0, 0, Math.PI * 2); ctx.fill();
                 ctx.strokeStyle = '#18181b'; ctx.lineWidth = 2.5;
@@ -560,8 +543,6 @@
                 ctx.beginPath(); ctx.arc(134, 154, 6, Math.PI * 0.15, Math.PI); ctx.stroke();
 
             } else if (charType === 'cat') {
-                // 🐱 냥이 (주황색 날렵한 스포츠 고양이)
-                // 뾰족한 고양이 귀
                 ctx.fillStyle = '#ea580c';
                 ctx.beginPath(); ctx.moveTo(60, 110); ctx.lineTo(80, 45); ctx.lineTo(115, 85); ctx.fill();
                 ctx.beginPath(); ctx.moveTo(196, 110); ctx.lineTo(176, 45); ctx.lineTo(141, 85); ctx.fill();
@@ -569,30 +550,25 @@
                 ctx.beginPath(); ctx.moveTo(68, 105); ctx.lineTo(82, 58); ctx.lineTo(108, 88); ctx.fill();
                 ctx.beginPath(); ctx.moveTo(188, 105); ctx.lineTo(174, 58); ctx.lineTo(148, 88); ctx.fill();
 
-                // 몸통
                 ctx.fillStyle = '#f97316';
                 drawRoundedRect(ctx, 80, 190, 96, 120, 20); ctx.fill();
                 ctx.fillStyle = '#fff7ed';
                 ctx.beginPath(); ctx.ellipse(128, 240, 28, 38, 0, 0, Math.PI * 2); ctx.fill();
 
-                // 머리
                 ctx.fillStyle = '#f97316';
                 ctx.beginPath(); ctx.arc(128, 130, 72, 0, Math.PI * 2); ctx.fill();
 
-                // 빨간색 스포츠 헤어밴드
                 ctx.fillStyle = '#dc2626';
                 drawRoundedRect(ctx, 58, 92, 140, 22, 6); ctx.fill();
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(116, 98, 24, 10);
 
-                // 고양이 수염 (양쪽 2가닥)
                 ctx.strokeStyle = '#18181b'; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
                 ctx.beginPath(); ctx.moveTo(64, 142); ctx.lineTo(88, 145); ctx.stroke();
                 ctx.beginPath(); ctx.moveTo(62, 154); ctx.lineTo(88, 152); ctx.stroke();
                 ctx.beginPath(); ctx.moveTo(192, 142); ctx.lineTo(168, 145); ctx.stroke();
                 ctx.beginPath(); ctx.moveTo(194, 154); ctx.lineTo(168, 152); ctx.stroke();
 
-                // 자신감 넘치는 눈
                 ctx.fillStyle = '#18181b';
                 ctx.beginPath(); ctx.arc(100, 130, 8, 0, Math.PI * 2); ctx.fill();
                 ctx.beginPath(); ctx.arc(156, 130, 8, 0, Math.PI * 2); ctx.fill();
@@ -600,7 +576,6 @@
                 ctx.beginPath(); ctx.arc(98, 128, 3, 0, Math.PI * 2); ctx.fill();
                 ctx.beginPath(); ctx.arc(154, 128, 3, 0, Math.PI * 2); ctx.fill();
 
-                // 코 & 고양이 입 (:3 모양)
                 ctx.fillStyle = '#f43f5e';
                 ctx.beginPath(); ctx.moveTo(124, 142); ctx.lineTo(132, 142); ctx.lineTo(128, 147); ctx.fill();
                 ctx.strokeStyle = '#18181b'; ctx.lineWidth = 3;
@@ -608,12 +583,9 @@
                 ctx.beginPath(); ctx.arc(134, 151, 6, Math.PI * 0.1, Math.PI); ctx.stroke();
 
             } else if (charType === 'chick') {
-                // 🐥 삐약이 (노란색 깜찍한 병아리)
-                // 몸통 & 머리 (통통한 원형)
                 ctx.fillStyle = '#facc15';
                 drawRoundedRect(ctx, 75, 130, 106, 170, 48); ctx.fill();
 
-                // 머리 위 귀여운 새싹 깃털
                 ctx.strokeStyle = '#16a34a'; ctx.lineWidth = 4; ctx.lineCap = 'round';
                 ctx.beginPath(); ctx.arc(120, 115, 16, Math.PI * 1.2, Math.PI * 1.9); ctx.stroke();
                 ctx.beginPath(); ctx.arc(136, 115, 16, Math.PI * 1.1, Math.PI * 1.8); ctx.stroke();
@@ -621,17 +593,14 @@
                 ctx.beginPath(); ctx.ellipse(114, 102, 7, 12, -0.4, 0, Math.PI * 2); ctx.fill();
                 ctx.beginPath(); ctx.ellipse(142, 102, 7, 12, 0.4, 0, Math.PI * 2); ctx.fill();
 
-                // 날개
                 ctx.fillStyle = '#eab308';
                 ctx.beginPath(); ctx.ellipse(65, 210, 14, 28, 0.2, 0, Math.PI * 2); ctx.fill();
                 ctx.beginPath(); ctx.ellipse(191, 210, 14, 28, -0.2, 0, Math.PI * 2); ctx.fill();
 
-                // 오렌지 볼터치
                 ctx.fillStyle = '#fb923c';
                 ctx.beginPath(); ctx.arc(92, 185, 10, 0, Math.PI * 2); ctx.fill();
                 ctx.beginPath(); ctx.arc(164, 185, 10, 0, Math.PI * 2); ctx.fill();
 
-                // 똘망똘망한 눈
                 ctx.fillStyle = '#18181b';
                 ctx.beginPath(); ctx.arc(104, 172, 8, 0, Math.PI * 2); ctx.fill();
                 ctx.beginPath(); ctx.arc(152, 172, 8, 0, Math.PI * 2); ctx.fill();
@@ -639,7 +608,6 @@
                 ctx.beginPath(); ctx.arc(102, 169, 3, 0, Math.PI * 2); ctx.fill();
                 ctx.beginPath(); ctx.arc(150, 169, 3, 0, Math.PI * 2); ctx.fill();
 
-                // 뾰족 오렌지 부리
                 ctx.fillStyle = '#ea580c';
                 ctx.beginPath();
                 ctx.moveTo(128, 172);
@@ -786,6 +754,7 @@
         function startTutorial() {
             gameMode = 'TUTORIAL';
             tutStep = 1;
+            serverSide = 'BLUE';
             tutCard.style.display = 'block';
             quizContainer.style.display = 'none';
             document.getElementById('meter-group-p2').style.display = 'none';
@@ -804,11 +773,11 @@
             document.getElementById('guide-p4').style.display = 'none';
 
             setupTutorialStep(1);
-            resetRally(true);
         }
 
         function setupTutorialStep(step) {
             tutStep = step;
+            serverSide = 'BLUE';
             quizContainer.style.display = 'none';
 
             if (step === 1) {
@@ -819,8 +788,7 @@
 
                 const targetW = hL - SHORT_SERV;
                 setHighlightZone(SHORT_SERV + targetW/2, -hWS/2, targetW, hWS, 0.45, 0x38bdf8);
-                players[0].x = -3.8; players[0].z = 1.2;
-                resetRally(false);
+                resetRallyToPlayer(players[0]);
             } else if (step === 2) {
                 tutBadge.innerText = "STEP 2/4: 코트 규격 차이 & 퀴즈";
                 tutTitle.innerText = "단식 vs 복식 라인 차이";
@@ -842,15 +810,32 @@
 
                 const servBoxW = LONG_SERV_D - SHORT_SERV;
                 setHighlightZone(SHORT_SERV + servBoxW/2, -hWD/2, servBoxW, hWD, 0.45, 0x22c55e);
-                players[0].x = -3.8; players[0].z = 1.2;
-                resetRally(false);
+                resetRallyToPlayer(players[0]);
             } else if (step === 4) {
                 tutBadge.innerText = "STEP 4/4: 점수 및 종료 룰";
                 tutTitle.innerText = "21점 랠리포인트제 & 듀스 규칙";
                 tutDesc.innerHTML = "• <b>21점 랠리포인트:</b> 서브권 여부와 무관하게 랠리를 이긴 팀이 1점을 획득하고 다음 서브권을 가져옵니다.<br>• <b>21점 선취 승리:</b> 1게임을 21점 먼저 낸 팀이 승리합니다.<br>• <b>듀스(Deuce):</b> 20:20 동점 시 2점 차가 날 때까지 진행되며, 29:29에서는 30점을 먼저 낸 팀이 최종 승리합니다!";
                 tutTarget.innerHTML = "<button class='action-btn' style='font-size:15px;padding:9px 22px;margin-top:6px;' onclick='finishTutorial()'>🏆 튜토리얼 완료 및 모든 모드 해금!</button>";
                 hideHighlightZone();
+                gameState = 'POINT_END';
             }
+        }
+
+        // 특정 선수 손으로 셔틀콕 즉시 순간이동 복귀
+        function resetRallyToPlayer(p) {
+            serverSide = p.team;
+            gameState = 'SERVE_READY';
+            p.x = -3.8; p.z = 1.2;
+            p.root.position.set(p.x, 0, p.z);
+            shuttle.x = p.x + 0.35;
+            shuttle.y = 1.0;
+            shuttle.z = p.z;
+            shuttle.vx = 0; shuttle.vy = 0; shuttle.vz = 0;
+            shuttle.lastHitTeam = null;
+            shuttle.hasCrossedNet = false;
+            shuttle.isServe = true;
+            shuttle.mesh.position.set(shuttle.x, shuttle.y, shuttle.z);
+            landingMarkerGroup.visible = false;
         }
 
         function skipTutorialStep() {
@@ -963,10 +948,19 @@
 
             if (serverSide === 'BLUE') {
                 players[0].x = -3.8; players[0].z = serveZ;
+                players[0].root.position.set(players[0].x, 0, players[0].z);
+                shuttle.x = players[0].x + 0.35;
+                shuttle.z = players[0].z;
+                shuttle.y = 1.0;
             } else {
                 players[2].x = 3.8; players[2].z = serveZ;
+                players[2].root.position.set(players[2].x, 0, players[2].z);
+                shuttle.x = players[2].x - 0.35;
+                shuttle.z = players[2].z;
+                shuttle.y = 1.0;
                 if (gameMode === 'VS_AI') setTimeout(() => aiServe(), 900);
             }
+            shuttle.mesh.position.set(shuttle.x, shuttle.y, shuttle.z);
         }
 
         /* ================= 타구 실행 (기술 & 파워 반영) ================= */
@@ -987,7 +981,7 @@
             }
 
             const dist = Math.hypot(player.x - shuttle.x, player.z - shuttle.z);
-            if (dist > 2.4) return;
+            if (dist > 2.5) return;
 
             player.isSwinging = true;
             player.swingProgress = 0;
@@ -1061,40 +1055,48 @@
             }
         }
 
-        /* ================= 🛑 착지 및 판정 (바닥 즉각 정지) ================= */
+        /* ================= 🛑 착지 및 판정 (다중 호출 완벽 방지) ================= */
         function judgeLanding(landingX, landingZ) {
+            // 🌟 1. 즉시 상태를 'POINT_END'로 변경하여 무한 루프 원천 차단!
+            gameState = 'POINT_END';
+            landingMarkerGroup.visible = false;
+
             const isDoubles = (gameMode === 'DOUBLES');
             const validW = (isDoubles ? DOUBLES_W : SINGLES_W) / 2;
             const inBounds = Math.abs(landingX) <= hL && Math.abs(landingZ) <= validW;
 
-            landingMarkerGroup.visible = false;
-
+            // 🎓 튜토리얼 단계별 실습 판정
             if (gameMode === 'TUTORIAL') {
                 if (tutStep === 1) {
-                    const inTarget = (landingX >= SHORT_SERV && landingX <= hL && landingZ >= -hWS && landingZ <= 0);
+                    // 단식 서브 구역 (넉넉하게 판정)
+                    const inTarget = (landingX >= SHORT_SERV && landingX <= hL + 0.3 && landingZ >= -hWS - 0.2 && landingZ <= 0.2);
                     if (inTarget && shuttle.lastHitTeam === 'BLUE') {
                         playSound('hit');
-                        showRefereeCall("🎯 서브 성공!", "단식 대각선 구역에 안착했습니다! 2단계로 이동합니다.", 2200);
-                        setTimeout(() => setupTutorialStep(2), 2000);
+                        showRefereeCall("🎯 서브 성공!", "대각선 구역에 정확히 안착했습니다! 2단계로 이동합니다.", 2000);
+                        setTimeout(() => setupTutorialStep(2), 1800);
                     } else {
-                        showRefereeCall("⚠️ 과녁을 벗어남!", "대각선 푸른 구역 안으로 서브를 넣어보세요. 다시 도전!", 1800);
-                        setTimeout(() => resetRally(false), 1800);
+                        playSound('fault');
+                        showRefereeCall("⚠️ 과녁을 벗어남!", "대각선 푸른 과녁 안으로 서브를 넣어보세요. (1.5초 후 셔틀콕이 돌아옵니다)", 2000);
+                        setTimeout(() => resetRallyToPlayer(players[0]), 1800);
                     }
                     return;
                 } else if (tutStep === 3) {
-                    const inTarget = (landingX >= SHORT_SERV && landingX <= LONG_SERV_D && landingZ >= -hWD && landingZ <= 0);
+                    // 복식 서브 구역
+                    const inTarget = (landingX >= SHORT_SERV && landingX <= LONG_SERV_D + 0.2 && landingZ >= -hWD - 0.2 && landingZ <= 0.2);
                     if (inTarget && shuttle.lastHitTeam === 'BLUE') {
                         playSound('hit');
-                        showRefereeCall("🎯 복식 서브 성공!", "복식 롱서비스 라인 안쪽으로 완벽히 넣었습니다! 4단계로 이동합니다.", 2200);
-                        setTimeout(() => setupTutorialStep(4), 2000);
+                        showRefereeCall("🎯 복식 서브 성공!", "복식 롱서비스 라인 안쪽으로 완벽히 넣었습니다! 4단계로 이동합니다.", 2000);
+                        setTimeout(() => setupTutorialStep(4), 1800);
                     } else {
-                        showRefereeCall("⚠️ 복식 서브 폴트!", "복식 롱서비스 라인을 넘었거나 과녁을 벗어났습니다. 다시 도전!", 1800);
-                        setTimeout(() => resetRally(false), 1800);
+                        playSound('fault');
+                        showRefereeCall("⚠️ 복식 서브 폴트!", "복식 롱서비스 라인을 넘었거나 과녁을 벗어났습니다. (1.5초 후 다시 시작)", 2000);
+                        setTimeout(() => resetRallyToPlayer(players[0]), 1800);
                     }
                     return;
                 }
             }
 
+            // 일반 서브 폴트 검사
             if (shuttle.isServe) {
                 const receivingDir = (shuttle.lastHitTeam === 'BLUE') ? 1 : -1;
                 const pastShort = (landingX * receivingDir) > SHORT_SERV;
@@ -1124,8 +1126,6 @@
         }
 
         function awardPoint(winner) {
-            gameState = 'POINT_END';
-
             if (winner === 'BLUE') scoreBlue++;
             else scoreRed++;
             serverSide = winner;
@@ -1460,7 +1460,7 @@
                         awardPoint(winner);
                     }
 
-                    // 🛑 바닥에 닿는 순간 즉시 속도를 0으로 하여 굴러가지 않고 멈춤
+                    // 🛑 바닥 착지 시 즉시 속도 0 및 판정 실행
                     if (shuttle.y <= 0.08) {
                         shuttle.y = 0.08;
                         shuttle.vx = 0;
