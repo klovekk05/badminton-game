@@ -41,6 +41,17 @@
             background: #1e293b !important; border-color: #334155 !important; color: #64748b !important;
         }
 
+        /* AI 난이도 선택 버튼 그룹 */
+        #ai-diff-selector {
+            display: none; gap: 4px; align-items: center; background: rgba(15, 23, 42, 0.9);
+            padding: 4px 8px; border-radius: 8px; border: 1px solid #d97706;
+        }
+        .diff-btn {
+            background: #1e293b; color: #94a3b8; border: 1px solid #475569;
+            padding: 4px 9px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer;
+        }
+        .diff-btn.active { background: #d97706; color: #fff; border-color: #f59e0b; }
+
         .scoreboard {
             background: rgba(15, 23, 42, 0.92); border: 2px solid #334155; border-radius: 12px;
             padding: 5px 20px; display: flex; gap: 20px; align-items: center; box-shadow: 0 8px 25px rgba(0,0,0,0.6);
@@ -131,25 +142,33 @@
             padding: 1px 5px; font-family: monospace; color: #facc15; font-weight: bold;
         }
 
-        /* QR 모달 */
+        /* QR 모달 (개선된 탭 분리) */
         #online-modal {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             background: #0f172a; border: 2px solid #10b981; border-radius: 18px;
-            padding: 22px 26px; text-align: center; max-width: 440px; width: 92%;
+            padding: 20px 24px; text-align: center; max-width: 440px; width: 92%;
             display: none; pointer-events: auto; z-index: 100; box-shadow: 0 20px 50px rgba(0,0,0,0.9);
         }
-        #online-modal h3 { color: #34d399; font-size: 19px; margin-bottom: 6px; }
+        #online-modal h3 { color: #34d399; font-size: 18px; margin-bottom: 8px; }
+        .online-tab-btns { display: flex; gap: 6px; justify-content: center; margin-bottom: 12px; }
+        .tab-btn {
+            background: #1e293b; border: 1px solid #475569; color: #cbd5e1; padding: 6px 14px;
+            border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer;
+        }
+        .tab-btn.active { background: #10b981; color: #fff; border-color: #10b981; }
+        
         #qrcode-container {
-            background: #fff; padding: 10px; border-radius: 10px; display: inline-block;
-            margin: 8px auto; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            background: #fff; padding: 8px; border-radius: 8px; display: inline-block;
+            margin: 6px auto; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
         .room-code-tag {
             font-size: 22px; font-family: monospace; font-weight: 900; color: #facc15;
             background: #1e293b; padding: 3px 12px; border-radius: 8px; display: inline-block; margin: 4px 0;
         }
         .p2p-input {
-            background: #1e293b; border: 1px solid #475569; color: #fff; padding: 7px 10px;
-            border-radius: 8px; font-size: 13.5px; outline: none; width: 130px; text-align: center;
+            background: #1e293b; border: 1px solid #475569; color: #fff; padding: 8px 12px;
+            border-radius: 8px; font-size: 15px; outline: none; width: 140px; text-align: center;
+            font-family: monospace; font-weight: bold; letter-spacing: 2px;
         }
         .action-btn {
             background: #10b981; color: #fff; border: none; padding: 7px 14px;
@@ -158,7 +177,7 @@
         .action-btn:hover { background: #059669; }
     </style>
 
-    <!-- Three.js 안정 CDN -->
+    <!-- Three.js (이중 안정 CDN) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
         if (typeof THREE === 'undefined') {
@@ -180,6 +199,12 @@
             <div class="mode-nav">
                 <button class="nav-btn tut-nav-btn active" id="btn-mode-tut" onclick="startTutorial()">🎓 4단계 룰 튜토리얼</button>
                 <button class="nav-btn ai-btn locked" id="btn-mode-ai" onclick="onModeClick('VS_AI')">🔒 AI 대전</button>
+                <div id="ai-diff-selector">
+                    <span style="font-size:11px;color:#facc15;font-weight:bold;">난이도:</span>
+                    <button class="diff-btn active" id="diff-easy" onclick="setAIDifficulty('EASY')">🥉 하(쉬움)</button>
+                    <button class="diff-btn" id="diff-normal" onclick="setAIDifficulty('NORMAL')">🥈 중(보통)</button>
+                    <button class="diff-btn" id="diff-hard" onclick="setAIDifficulty('HARD')">🥇 상(어려움)</button>
+                </div>
                 <button class="nav-btn locked" id="btn-mode-singles" onclick="onModeClick('SINGLES')">🔒 친구 단식(2P)</button>
                 <button class="nav-btn locked" id="btn-mode-doubles" onclick="onModeClick('DOUBLES')">🔒 4인 복식</button>
                 <button class="nav-btn online-btn locked" id="btn-mode-online" onclick="onModeClick('ONLINE')">🔒 온라인 대전</button>
@@ -245,37 +270,57 @@
         <!-- 하단 조작 가이드 -->
         <div class="bottom-panel">
             <div class="controls-card" id="control-guide-box">
-                <strong>[애니멀 배드민턴 조작 가이드]</strong><br>
+                <strong>[조작 가이드]</strong><br>
                 <span class="team-blue">● 1P 곰이 (BLUE 1):</span> <span class="key-badge">W,A,S,D</span> 이동 | <span class="key-badge">Space</span> 충전 후 뗌<br>
                 <span class="team-blue" id="guide-p2" style="display:none;">● 2P 토순이 (BLUE 2):</span> <span class="key-badge">T,F,G,H</span> 이동 | <span class="key-badge">B</span> 충전 후 뗌<br>
                 <span class="team-red" id="guide-p3" style="display:none;">● 3P 냥이 (RED 1):</span> <span class="key-badge">방향키</span> 이동 | <span class="key-badge">Enter</span> 충전 후 뗌<br>
                 <span class="team-red" id="guide-p4" style="display:none;">● 4P 삐약이 (RED 2):</span> <span class="key-badge">I,J,K,L</span> 이동 | <span class="key-badge">O</span> 충전 후 뗌
             </div>
-            <div style="font-size: 12.5px; color: #facc15; background: rgba(0,0,0,0.75); padding: 8px 12px; border-radius: 8px;">
-                🛑 <b>셔틀콕 정지:</b> 바닥에 닿는 순간 깃털 콕처럼 공이 굴러가지 않고 자리에 딱 멈춥니다!
+            <div style="font-size: 12px; color: #facc15; background: rgba(0,0,0,0.75); padding: 8px 12px; border-radius: 8px;">
+                🏆 <b>경기 종료 규칙:</b> 11점 선취 승리! (10:10 듀스 시 2점 차, 최대 15점)
             </div>
         </div>
     </div>
 
-    <!-- QR 모달 -->
+    <!-- QR & 온라인 모달 -->
     <div id="online-modal">
-        <h3>📱 QR 코드 & 초대 링크 공유</h3>
-        <p style="font-size: 12.5px; color: #cbd5e1; margin-bottom: 6px;">
-            친구가 <b>스마트폰 카메라</b>로 QR을 비추면 바로 방에 입장합니다!
-        </p>
-        <div id="qrcode-container"></div>
-        <div style="margin: 4px 0;">
-            내 방 코드: <span class="room-code-tag" id="my-room-code">----</span>
+        <h3>📱 실시간 온라인 1:1 대전</h3>
+        
+        <div class="online-tab-btns">
+            <button class="tab-btn active" id="tab-host" onclick="switchOnlineTab('HOST')">방 만들기 (호스트)</button>
+            <button class="tab-btn" id="tab-join" onclick="switchOnlineTab('JOIN')">방 참가하기 (게스트)</button>
         </div>
-        <div style="margin: 6px 0; display:flex; gap:6px; justify-content:center;">
-            <button class="action-btn" onclick="copyInviteUrl()">📋 초대 링크 복사</button>
-            <button class="action-btn" style="background:#475569;" onclick="closeOnlineModal()">닫기</button>
+
+        <!-- 호스트 탭 -->
+        <div id="panel-host-view">
+            <p style="font-size: 12px; color: #cbd5e1; margin-bottom: 4px;">
+                친구가 <b>카메라로 QR</b>을 찍거나 <b>초대 링크</b>를 클릭하면 즉시 연결됩니다!
+            </p>
+            <div id="qrcode-container"></div>
+            <div>
+                내 방 코드: <span class="room-code-tag" id="my-room-code">----</span>
+            </div>
+            <div style="margin: 8px 0; display:flex; gap:6px; justify-content:center;">
+                <button class="action-btn" onclick="copyInviteUrl()">📋 초대 링크 복사</button>
+                <button class="action-btn" style="background:#475569;" onclick="closeOnlineModal()">닫기</button>
+            </div>
         </div>
-        <div style="margin-top: 6px; display:flex; gap:4px; justify-content:center; align-items:center;">
-            <input type="text" id="friend-code-input" class="p2p-input" maxlength="4" placeholder="친구 코드 4자리">
-            <button class="action-btn" style="background:#2563eb;" onclick="joinByCode()">직접 참가</button>
+
+        <!-- 게스트 탭 -->
+        <div id="panel-join-view" style="display:none;">
+            <p style="font-size: 12.5px; color: #cbd5e1; margin: 10px 0;">
+                친구가 알려준 <b>4자리 코드</b>를 입력하세요.
+            </p>
+            <div style="margin: 14px 0; display:flex; gap:6px; justify-content:center;">
+                <input type="text" id="friend-code-input" class="p2p-input" maxlength="4" placeholder="CODE">
+                <button class="action-btn" style="background:#2563eb;" onclick="joinByCode()">접속하기</button>
+            </div>
+            <div style="margin-top: 10px;">
+                <button class="action-btn" style="background:#475569;" onclick="closeOnlineModal()">닫기</button>
+            </div>
         </div>
-        <div id="online-connection-msg" style="font-size: 11.5px; color: #facc15; margin-top: 6px;">초대 대기 중...</div>
+
+        <div id="online-connection-msg" style="font-size: 12px; color: #facc15; margin-top: 8px;">P2P 서버 접속 준비 중...</div>
     </div>
 
     <script>
@@ -326,6 +371,22 @@
             checkTutorialLock();
             playSound('hit');
             showRefereeCall("🎉 모든 모드 해금!", "축하합니다! 이제 AI 및 친구와의 모든 대전 모드를 즐길 수 있습니다.", 3500);
+        }
+
+        /* ================= 🤖 AI 난이도 시스템 (하/중/상) ================= */
+        let aiDifficulty = 'EASY'; // 'EASY', 'NORMAL', 'HARD'
+
+        function setAIDifficulty(diff) {
+            aiDifficulty = diff;
+            ['diff-easy', 'diff-normal', 'diff-hard'].forEach(id => {
+                document.getElementById(id).classList.remove('active');
+            });
+            if (diff === 'EASY') document.getElementById('diff-easy').classList.add('active');
+            else if (diff === 'NORMAL') document.getElementById('diff-normal').classList.add('active');
+            else if (diff === 'HARD') document.getElementById('diff-hard').classList.add('active');
+
+            const diffNames = { EASY: "🥉 하 (쉬움)", NORMAL: "🥈 중 (보통)", HARD: "🥇 상 (어려움)" };
+            showRefereeCall("난이도 변경!", `AI 냥이 난이도가 <b>${diffNames[diff]}</b>(으)로 설정되었습니다.`, 1800);
         }
 
         /* ================= Web Audio 사운드 ================= */
@@ -452,7 +513,7 @@
         }
         function hideHighlightZone() { highlightMat.opacity = 0.0; }
 
-        /* ================= 🎨 범용 곡선 헬퍼 ================= */
+        /* ================= 🎨 둥근 사각형 헬퍼 ================= */
         function drawRoundedRect(ctx, x, y, w, h, r) {
             ctx.beginPath();
             ctx.moveTo(x + r, y);
@@ -464,7 +525,7 @@
             ctx.closePath();
         }
 
-        /* ================= 🎨 100% 저작권 없는 오리지널 동물 캐릭터 ================= */
+        /* ================= 🎨 저작권 없는 오리지널 동물 캐릭터 ================= */
         function generateOriginalCharacterTexture(charType) {
             const canvas = document.createElement('canvas');
             canvas.width = 256; canvas.height = 360;
@@ -508,7 +569,6 @@
                 ctx.beginPath(); ctx.moveTo(128, 144); ctx.lineTo(128, 153); ctx.stroke();
                 ctx.beginPath(); ctx.arc(122, 152, 6, 0, Math.PI * 0.85); ctx.stroke();
                 ctx.beginPath(); ctx.arc(134, 152, 6, Math.PI * 0.15, Math.PI); ctx.stroke();
-
             } else if (charType === 'bunny') {
                 ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 4;
                 ctx.beginPath(); ctx.ellipse(90, 55, 18, 55, -0.1, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
@@ -541,7 +601,6 @@
                 ctx.strokeStyle = '#18181b'; ctx.lineWidth = 2.5;
                 ctx.beginPath(); ctx.arc(122, 154, 6, 0, Math.PI * 0.85); ctx.stroke();
                 ctx.beginPath(); ctx.arc(134, 154, 6, Math.PI * 0.15, Math.PI); ctx.stroke();
-
             } else if (charType === 'cat') {
                 ctx.fillStyle = '#ea580c';
                 ctx.beginPath(); ctx.moveTo(60, 110); ctx.lineTo(80, 45); ctx.lineTo(115, 85); ctx.fill();
@@ -581,7 +640,6 @@
                 ctx.strokeStyle = '#18181b'; ctx.lineWidth = 3;
                 ctx.beginPath(); ctx.arc(122, 151, 6, 0, Math.PI * 0.9); ctx.stroke();
                 ctx.beginPath(); ctx.arc(134, 151, 6, Math.PI * 0.1, Math.PI); ctx.stroke();
-
             } else if (charType === 'chick') {
                 ctx.fillStyle = '#facc15';
                 drawRoundedRect(ctx, 75, 130, 106, 170, 48); ctx.fill();
@@ -758,6 +816,7 @@
             tutCard.style.display = 'block';
             quizContainer.style.display = 'none';
             document.getElementById('meter-group-p2').style.display = 'none';
+            document.getElementById('ai-diff-selector').style.display = 'none';
             setActiveNav('btn-mode-tut');
 
             document.getElementById('name-blue').innerText = '🐻 곰이 (훈련)';
@@ -788,7 +847,7 @@
 
                 const targetW = hL - SHORT_SERV;
                 setHighlightZone(SHORT_SERV + targetW/2, -hWS/2, targetW, hWS, 0.45, 0x38bdf8);
-                resetRallyToPlayer(players[0]);
+                resetRallyToFixedServer();
             } else if (step === 2) {
                 tutBadge.innerText = "STEP 2/4: 코트 규격 차이 & 퀴즈";
                 tutTitle.innerText = "단식 vs 복식 라인 차이";
@@ -810,26 +869,28 @@
 
                 const servBoxW = LONG_SERV_D - SHORT_SERV;
                 setHighlightZone(SHORT_SERV + servBoxW/2, -hWD/2, servBoxW, hWD, 0.45, 0x22c55e);
-                resetRallyToPlayer(players[0]);
+                resetRallyToFixedServer();
             } else if (step === 4) {
                 tutBadge.innerText = "STEP 4/4: 점수 및 종료 룰";
-                tutTitle.innerText = "21점 랠리포인트제 & 듀스 규칙";
-                tutDesc.innerHTML = "• <b>21점 랠리포인트:</b> 서브권 여부와 무관하게 랠리를 이긴 팀이 1점을 획득하고 다음 서브권을 가져옵니다.<br>• <b>21점 선취 승리:</b> 1게임을 21점 먼저 낸 팀이 승리합니다.<br>• <b>듀스(Deuce):</b> 20:20 동점 시 2점 차가 날 때까지 진행되며, 29:29에서는 30점을 먼저 낸 팀이 최종 승리합니다!";
+                tutTitle.innerText = "11점 랠리포인트제 & 듀스 규칙";
+                tutDesc.innerHTML = "• <b>랠리포인트제:</b> 서브권 상관없이 랠리에서 이긴 팀이 1점과 서브권을 가져옵니다.<br>• <b>11점 선취 세트 종료:</b> 11점을 먼저 낸 팀이 세트를 가져갑니다.<br>• <b>듀스(Deuce):</b> 10:10 동점 시 2점 차가 벌어질 때까지 계속되며, 14:14에서는 15점을 먼저 낸 팀이 최종 승리합니다!";
                 tutTarget.innerHTML = "<button class='action-btn' style='font-size:15px;padding:9px 22px;margin-top:6px;' onclick='finishTutorial()'>🏆 튜토리얼 완료 및 모든 모드 해금!</button>";
                 hideHighlightZone();
                 gameState = 'POINT_END';
             }
         }
 
-        // 특정 선수 손으로 셔틀콕 즉시 순간이동 복귀
-        function resetRallyToPlayer(p) {
-            serverSide = p.team;
+        // 🌟 서비스 코트에 위치를 딱 고정하여 리셋
+        function resetRallyToFixedServer() {
+            serverSide = 'BLUE';
             gameState = 'SERVE_READY';
-            p.x = -3.8; p.z = 1.2;
-            p.root.position.set(p.x, 0, p.z);
-            shuttle.x = p.x + 0.35;
+            const serveZ = (scoreBlue % 2 === 0) ? 1.2 : -1.2;
+            players[0].x = -3.8; players[0].z = serveZ;
+            players[0].root.position.set(players[0].x, 0, players[0].z);
+
+            shuttle.x = players[0].x + 0.35;
             shuttle.y = 1.0;
-            shuttle.z = p.z;
+            shuttle.z = players[0].z;
             shuttle.vx = 0; shuttle.vy = 0; shuttle.vz = 0;
             shuttle.lastHitTeam = null;
             shuttle.hasCrossedNet = false;
@@ -869,6 +930,7 @@
             tutCard.style.display = 'none';
             hideHighlightZone();
             setActiveNav('btn-mode-ai');
+            document.getElementById('ai-diff-selector').style.display = 'flex';
 
             document.getElementById('name-blue').innerText = '🐻 곰이 (1P)';
             document.getElementById('name-red').innerText = '🐱 냥이 (AI)';
@@ -884,7 +946,7 @@
             document.getElementById('guide-p4').style.display = 'none';
 
             resetRally(true);
-            showRefereeCall("🐻 곰이 VS 🐱 냥이!", "AI 싱글 대전 시작! 바닥의 낙하 예측 마커로 이동하세요.", 2200);
+            showRefereeCall("🐻 곰이 VS 🐱 냥이!", "11점 매치 시작! 상단에서 난이도(하/중/상)를 고를 수 있습니다.", 2500);
         }
 
         /* ================= 🏸 친구 단식(2P) & 👥 친구 복식(4P) ================= */
@@ -892,6 +954,7 @@
             gameMode = type;
             tutCard.style.display = 'none';
             hideHighlightZone();
+            document.getElementById('ai-diff-selector').style.display = 'none';
 
             const isD = (type === 'DOUBLES');
             setActiveNav(isD ? 'btn-mode-doubles' : 'btn-mode-singles');
@@ -912,8 +975,8 @@
             resetRally(true);
             showRefereeCall(
                 isD ? "👥 애니멀 4인 복식 경기 시작!" : "🏸 곰이 VS 냥이 (로컬 2P 단식)!",
-                isD ? "1P(Space), 2P(B), 3P(Enter), 4P(O)로 4명 모두 플레이합니다." : "1P는 Space, 2P는 Enter로 충전하여 플레이합니다.",
-                2500
+                "11점을 먼저 내는 팀이 승리합니다!",
+                2400
             );
         }
 
@@ -931,7 +994,7 @@
             document.getElementById('score-red').innerText = scoreRed;
         }
 
-        /* ================= 랠리 리셋 ================= */
+        /* ================= 랠리 리셋 (위치 고정 리셋) ================= */
         function resetRally(hardReset = false) {
             if (hardReset) { scoreBlue = 0; scoreRed = 0; updateScoreboard(); }
 
@@ -942,19 +1005,23 @@
             shuttle.isServe = true;
             landingMarkerGroup.visible = false;
 
+            // 🌟 점수 규칙에 맞춰 서비스 위치 정확히 고정
             const curScore = (serverSide === 'BLUE') ? scoreBlue : scoreRed;
             const isEven = (curScore % 2 === 0);
-            const serveZ = isEven ? 1.2 : -1.2;
+            const blueServeZ = isEven ? 1.2 : -1.2;
+            const redServeZ = isEven ? -1.2 : 1.2; // 대각선 반대편
+
+            players[0].x = -3.8; players[0].z = blueServeZ;
+            players[0].root.position.set(players[0].x, 0, players[0].z);
+
+            players[2].x = 3.8; players[2].z = redServeZ;
+            players[2].root.position.set(players[2].x, 0, players[2].z);
 
             if (serverSide === 'BLUE') {
-                players[0].x = -3.8; players[0].z = serveZ;
-                players[0].root.position.set(players[0].x, 0, players[0].z);
                 shuttle.x = players[0].x + 0.35;
                 shuttle.z = players[0].z;
                 shuttle.y = 1.0;
             } else {
-                players[2].x = 3.8; players[2].z = serveZ;
-                players[2].root.position.set(players[2].x, 0, players[2].z);
                 shuttle.x = players[2].x - 0.35;
                 shuttle.z = players[2].z;
                 shuttle.y = 1.0;
@@ -1055,9 +1122,8 @@
             }
         }
 
-        /* ================= 🛑 착지 및 판정 (다중 호출 완벽 방지) ================= */
+        /* ================= 🛑 착지 및 판정 ================= */
         function judgeLanding(landingX, landingZ) {
-            // 🌟 1. 즉시 상태를 'POINT_END'로 변경하여 무한 루프 원천 차단!
             gameState = 'POINT_END';
             landingMarkerGroup.visible = false;
 
@@ -1065,10 +1131,8 @@
             const validW = (isDoubles ? DOUBLES_W : SINGLES_W) / 2;
             const inBounds = Math.abs(landingX) <= hL && Math.abs(landingZ) <= validW;
 
-            // 🎓 튜토리얼 단계별 실습 판정
             if (gameMode === 'TUTORIAL') {
                 if (tutStep === 1) {
-                    // 단식 서브 구역 (넉넉하게 판정)
                     const inTarget = (landingX >= SHORT_SERV && landingX <= hL + 0.3 && landingZ >= -hWS - 0.2 && landingZ <= 0.2);
                     if (inTarget && shuttle.lastHitTeam === 'BLUE') {
                         playSound('hit');
@@ -1076,12 +1140,11 @@
                         setTimeout(() => setupTutorialStep(2), 1800);
                     } else {
                         playSound('fault');
-                        showRefereeCall("⚠️ 과녁을 벗어남!", "대각선 푸른 과녁 안으로 서브를 넣어보세요. (1.5초 후 셔틀콕이 돌아옵니다)", 2000);
-                        setTimeout(() => resetRallyToPlayer(players[0]), 1800);
+                        showRefereeCall("⚠️ 과녁을 벗어남!", "대각선 푸른 과녁 안으로 서브를 넣어보세요. (다시 시작합니다)", 2000);
+                        setTimeout(() => resetRallyToFixedServer(), 1800);
                     }
                     return;
                 } else if (tutStep === 3) {
-                    // 복식 서브 구역
                     const inTarget = (landingX >= SHORT_SERV && landingX <= LONG_SERV_D + 0.2 && landingZ >= -hWD - 0.2 && landingZ <= 0.2);
                     if (inTarget && shuttle.lastHitTeam === 'BLUE') {
                         playSound('hit');
@@ -1089,14 +1152,13 @@
                         setTimeout(() => setupTutorialStep(4), 1800);
                     } else {
                         playSound('fault');
-                        showRefereeCall("⚠️ 복식 서브 폴트!", "복식 롱서비스 라인을 넘었거나 과녁을 벗어났습니다. (1.5초 후 다시 시작)", 2000);
-                        setTimeout(() => resetRallyToPlayer(players[0]), 1800);
+                        showRefereeCall("⚠️ 복식 서브 폴트!", "복식 롱서비스 라인을 넘었거나 과녁을 벗어났습니다. (다시 시작)", 2000);
+                        setTimeout(() => resetRallyToFixedServer(), 1800);
                     }
                     return;
                 }
             }
 
-            // 일반 서브 폴트 검사
             if (shuttle.isServe) {
                 const receivingDir = (shuttle.lastHitTeam === 'BLUE') ? 1 : -1;
                 const pastShort = (landingX * receivingDir) > SHORT_SERV;
@@ -1125,16 +1187,18 @@
             }
         }
 
+        /* ================= 🏆 11점 세트 종료 및 듀스 ================= */
         function awardPoint(winner) {
             if (winner === 'BLUE') scoreBlue++;
             else scoreRed++;
             serverSide = winner;
             updateScoreboard();
 
-            if (scoreBlue >= 21 || scoreRed >= 21) {
+            // 11점 선취 & 듀스(최대 15점)
+            if (scoreBlue >= 11 || scoreRed >= 11) {
                 const diff = Math.abs(scoreBlue - scoreRed);
-                if (diff >= 2 || scoreBlue === 30 || scoreRed === 30) {
-                    showRefereeCall("🏆 GAME SET!", `<b>${winner === 'BLUE' ? '블루팀' : '레드팀'} 최종 승리!</b>`, 4000);
+                if (diff >= 2 || scoreBlue === 15 || scoreRed === 15) {
+                    showRefereeCall("🏆 GAME SET!", `<b>${winner === 'BLUE' ? '블루팀' : '레드팀'} 11점 달성 최종 승리!</b>`, 4000);
                     setTimeout(() => resetRally(true), 4000);
                     return;
                 }
@@ -1143,10 +1207,11 @@
             setTimeout(() => resetRally(false), 2000);
         }
 
-        /* ================= 🤖 냥이 AI 로직 ================= */
+        /* ================= 🤖 난이도별 AI 냥이 로직 ================= */
         function aiServe() {
             if (gameState !== 'SERVE_READY' || serverSide !== 'RED') return;
-            executeStroke(players[2], 0.65);
+            const power = (aiDifficulty === 'EASY') ? 0.45 : 0.65;
+            executeStroke(players[2], power);
         }
 
         function updateAI(dt) {
@@ -1154,14 +1219,34 @@
             const ai = players[2];
 
             if (gameState === 'IN_PLAY' && shuttle.vx > 0) {
-                ai.z += (shuttle.z - ai.z) * 3.6 * dt;
-                ai.x += (Math.max(1.8, Math.min(5.2, shuttle.x)) - ai.x) * 3.3 * dt;
+                let aiSpeed = 3.4;
+                let reactionDelay = 0;
+
+                if (aiDifficulty === 'EASY') {
+                    aiSpeed = 2.0; // 느린 이동
+                    reactionDelay = 0.2; // 약간 늦은 반응
+                } else if (aiDifficulty === 'HARD') {
+                    aiSpeed = 4.6; // 매우 빠른 반응
+                }
+
+                ai.z += (shuttle.z - ai.z) * aiSpeed * dt;
+                ai.x += (Math.max(1.8, Math.min(5.2, shuttle.x)) - ai.x) * (aiSpeed * 0.9) * dt;
                 ai.root.position.set(ai.x, 0, ai.z);
 
                 const dist = Math.hypot(ai.x - shuttle.x, ai.z - shuttle.z);
-                if (dist < 1.9 && shuttle.y <= 2.5) {
-                    const aiPower = (shuttle.y > 1.9) ? 0.8 : (0.4 + Math.random() * 0.4);
-                    executeStroke(ai, aiPower);
+                if (dist < 2.0 && shuttle.y <= 2.5) {
+                    if (aiDifficulty === 'EASY') {
+                        // 하 난이도: 가끔 실수(15%) 및 치기 쉬운 하이볼 제공
+                        if (Math.random() < 0.15) return;
+                        executeStroke(ai, 0.4); // 부드럽게 띄워줌
+                    } else if (aiDifficulty === 'NORMAL') {
+                        const aiPower = (shuttle.y > 2.0) ? 0.7 : 0.5;
+                        executeStroke(ai, aiPower);
+                    } else if (aiDifficulty === 'HARD') {
+                        // 상 난이도: 스매시 적극 구사
+                        const aiPower = (shuttle.y > 1.9) ? 0.9 : 0.75;
+                        executeStroke(ai, aiPower);
+                    }
                 }
             }
         }
@@ -1214,25 +1299,34 @@
             if (e.key === 'o' || e.key === 'O') releaseCharge(players[3]);
         });
 
-        /* ================= 📱 GitHub 배포용 실시간 온라인 P2P ================= */
+        /* ================= 📱 강력한 WebRTC P2P (구글 STUN + 타임아웃 방지) ================= */
         let peer = null;
         let peerConn = null;
         let isHost = false;
         let mySimpleCode = "";
+        let connectTimeoutTimer = null;
 
         const peerConfig = {
             config: {
                 iceServers: [
                     { urls: 'stun:stun.l.google.com:19302' },
-                    { urls: 'stun:stun1.l.google.com:19302' }
+                    { urls: 'stun:stun1.l.google.com:19302' },
+                    { urls: 'stun:stun.cloudflare.com:3478' }
                 ]
             }
         };
 
+        function switchOnlineTab(tab) {
+            document.getElementById('tab-host').classList.toggle('active', tab === 'HOST');
+            document.getElementById('tab-join').classList.toggle('active', tab === 'JOIN');
+            document.getElementById('panel-host-view').style.display = (tab === 'HOST') ? 'block' : 'none';
+            document.getElementById('panel-join-view').style.display = (tab === 'JOIN') ? 'block' : 'none';
+        }
+
         function openOnlineQRModal() {
             const modal = document.getElementById('online-modal');
             modal.style.display = 'block';
-            document.getElementById('online-connection-msg').innerText = "온라인 연결 준비 중...";
+            document.getElementById('online-connection-msg').innerText = "P2P 네트워크 준비 중...";
 
             if (!peer) {
                 mySimpleCode = Math.random().toString(36).substring(2, 6).toUpperCase();
@@ -1243,15 +1337,16 @@
                     peer.on('open', id => {
                         document.getElementById('my-room-code').innerText = mySimpleCode;
                         generateQR(id);
+                        document.getElementById('online-connection-msg').innerText = "방 생성 완료! 친구를 초대하세요.";
                     });
                     peer.on('connection', conn => {
                         peerConn = conn;
                         isHost = true;
-                        handleOnlineConnect("친구가 접속했습니다!");
+                        setupDataHandlers();
                     });
                     peer.on('error', err => {
-                        console.warn(err);
-                        document.getElementById('online-connection-msg').innerText = "P2P 네트워크 확인 중...";
+                        console.warn("Peer error:", err);
+                        document.getElementById('online-connection-msg').innerText = "연결 오류 발생 (다시 시도해주세요)";
                     });
                 } catch(e) {
                     console.error(e);
@@ -1264,6 +1359,7 @@
 
         function closeOnlineModal() {
             document.getElementById('online-modal').style.display = 'none';
+            if (connectTimeoutTimer) clearTimeout(connectTimeoutTimer);
         }
 
         function generateQR(fullId) {
@@ -1277,17 +1373,16 @@
                 if (typeof QRCode !== 'undefined') {
                     new QRCode(qrContainer, {
                         text: joinUrl,
-                        width: 140,
-                        height: 140,
+                        width: 130,
+                        height: 130,
                         colorDark: "#0f172a",
                         colorLight: "#ffffff"
                     });
                 } else {
-                    qrContainer.innerHTML = "<div style='padding:20px;color:#000;font-weight:bold;'>코드: " + mySimpleCode + "</div>";
+                    qrContainer.innerHTML = "<div style='padding:15px;color:#000;font-weight:bold;'>코드: " + mySimpleCode + "</div>";
                 }
-                document.getElementById('online-connection-msg').innerText = "QR을 스캔하거나 링크를 전달하세요!";
             } catch(e) {
-                qrContainer.innerHTML = "<div style='padding:20px;color:#000;font-weight:bold;'>코드: " + mySimpleCode + "</div>";
+                qrContainer.innerHTML = "<div style='padding:15px;color:#000;font-weight:bold;'>코드: " + mySimpleCode + "</div>";
             }
         }
 
@@ -1295,42 +1390,49 @@
             const baseUrl = window.location.origin + window.location.pathname;
             const joinUrl = baseUrl + '?room=' + mySimpleCode;
             navigator.clipboard.writeText(joinUrl).then(() => {
-                alert("초대 링크가 복사되었습니다! 카톡 등에 붙여넣으세요:\n" + joinUrl);
+                alert("초대 링크가 복사되었습니다! 친구에게 보내세요:\n" + joinUrl);
             });
         }
 
+        // 게스트의 직접 참가 처리
         function joinByCode() {
             const input = document.getElementById('friend-code-input').value.trim().toUpperCase();
             if (input.length !== 4) { alert("4자리 방 코드를 정확히 입력하세요!"); return; }
 
-            document.getElementById('online-connection-msg').innerText = "방 연결 시도 중...";
+            document.getElementById('online-connection-msg').innerText = "상대방 호스트 찾는 중 (최대 7초)...";
             const targetPeerId = "ANIMAL-" + input;
 
-            if (!peer) peer = new Peer(peerConfig);
-            peerConn = peer.connect(targetPeerId);
-            isHost = false;
+            // 7초 타임아웃 방지책
+            if (connectTimeoutTimer) clearTimeout(connectTimeoutTimer);
+            connectTimeoutTimer = setTimeout(() => {
+                document.getElementById('online-connection-msg').innerHTML = 
+                    "<span style='color:#ef4444;'>❌ 연결 실패: 상대방이 방을 열고 있는지 확인하세요!</span>";
+            }, 7000);
 
-            peerConn.on('open', () => {
-                handleOnlineConnect("성공적으로 접속되었습니다!");
-            });
+            function doConnect() {
+                try {
+                    peerConn = peer.connect(targetPeerId, { reliable: true });
+                    isHost = false;
+                    setupDataHandlers();
+                } catch(e) {
+                    console.error(e);
+                }
+            }
+
+            if (!peer || !peer.open) {
+                const guestId = "GUEST-" + Math.random().toString(36).substring(2, 7).toUpperCase();
+                peer = new Peer(guestId, peerConfig);
+                peer.on('open', () => doConnect());
+            } else {
+                doConnect();
+            }
         }
 
-        function handleOnlineConnect(msg) {
-            closeOnlineModal();
-            gameMode = 'ONLINE';
-            tutCard.style.display = 'none';
-            hideHighlightZone();
-            setActiveNav('btn-mode-online');
-
-            document.getElementById('name-blue').innerText = isHost ? "🐻 곰이 (나)" : "🐱 냥이 (친구)";
-            document.getElementById('name-red').innerText = isHost ? "🐱 냥이 (친구)" : "🐻 곰이 (나)";
-
-            players[1].active = false; players[1].root.visible = false;
-            players[3].active = false; players[3].root.visible = false;
-            players[2].active = true; players[2].root.visible = true;
-
-            showRefereeCall("🌐 실시간 온라인 대전 시작!", msg, 3000);
-            resetRally(true);
+        function setupDataHandlers() {
+            peerConn.on('open', () => {
+                if (connectTimeoutTimer) clearTimeout(connectTimeoutTimer);
+                handleOnlineConnect(isHost ? "친구가 입장했습니다!" : "방에 성공적으로 접속되었습니다!");
+            });
 
             peerConn.on('data', data => {
                 if (data.type === 'state_sync') {
@@ -1347,9 +1449,33 @@
                     }
                 }
             });
+
+            peerConn.on('error', err => {
+                console.warn(err);
+                document.getElementById('online-connection-msg').innerText = "연결 오류 발생 (다시 시도해주세요)";
+            });
         }
 
-        /* ================= 렌더링 & 4인 플레이어 조작 루프 ================= */
+        function handleOnlineConnect(msg) {
+            closeOnlineModal();
+            gameMode = 'ONLINE';
+            tutCard.style.display = 'none';
+            hideHighlightZone();
+            setActiveNav('btn-mode-online');
+            document.getElementById('ai-diff-selector').style.display = 'none';
+
+            document.getElementById('name-blue').innerText = isHost ? "🐻 곰이 (나)" : "🐱 냥이 (친구)";
+            document.getElementById('name-red').innerText = isHost ? "🐱 냥이 (친구)" : "🐻 곰이 (나)";
+
+            players[1].active = false; players[1].root.visible = false;
+            players[3].active = false; players[3].root.visible = false;
+            players[2].active = true; players[2].root.visible = true;
+
+            showRefereeCall("🌐 실시간 1:1 대전 시작!", msg, 3000);
+            resetRally(true);
+        }
+
+        /* ================= 렌더링 & 플레이어 조작 루프 ================= */
         const clock = new THREE.Clock();
 
         function animate() {
@@ -1418,7 +1544,7 @@
                 }
             });
 
-            // 🛑 셔틀콕 물리 처리 (바닥 착지 시 즉시 정지)
+            // 🛑 셔틀콕 물리 처리
             if (gameMode !== 'ONLINE' || isHost) {
                 if (gameState === 'IN_PLAY') {
                     shuttle.vy -= 8.8 * dt;
@@ -1460,7 +1586,7 @@
                         awardPoint(winner);
                     }
 
-                    // 🛑 바닥 착지 시 즉시 속도 0 및 판정 실행
+                    // 바닥 착지 시 즉시 정지
                     if (shuttle.y <= 0.08) {
                         shuttle.y = 0.08;
                         shuttle.vx = 0;
@@ -1500,7 +1626,7 @@
             }
         });
 
-        // 🌟 브라우저 로딩 즉시 안전 구동 (초대 URL 자동 접속 포함)
+        // 🌟 브라우저 로딩 즉시 안전 구동
         window.addEventListener('DOMContentLoaded', () => {
             try {
                 checkTutorialLock();
@@ -1508,14 +1634,9 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 const joinRoom = urlParams.get('room');
                 if (joinRoom) {
-                    showRefereeCall("🌐 초대 방 접속 중...", "친구 방에 자동으로 연결합니다.", 3000);
-                    const targetPeerId = "ANIMAL-" + joinRoom.toUpperCase();
-                    peer = new Peer(peerConfig);
-                    peer.on('open', () => {
-                        peerConn = peer.connect(targetPeerId);
-                        isHost = false;
-                        peerConn.on('open', () => handleOnlineConnect("성공적으로 접속되었습니다!"));
-                    });
+                    showRefereeCall("🌐 초대 방 자동 참가", "친구 방에 연결을 시도합니다.", 3000);
+                    document.getElementById('friend-code-input').value = joinRoom.toUpperCase();
+                    joinByCode();
                 } else {
                     startTutorial();
                 }
